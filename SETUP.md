@@ -145,23 +145,23 @@ Deploys come from GitHub Actions with `wrangler pages deploy`, not from Cloudfla
 
    Alternative to step 1: add the site manually, copy the snippet's `token` value, and run `gh secret set CF_WEB_ANALYTICS_SITE_TOKEN`. The build then adds the beacon itself. Use one method, not both.
 
-## 6. Enquiry email (Email Routing on a subdomain)
+## 6. Enquiry email (Email Sending on a subdomain)
 
-**Important:** the domain's email runs on Microsoft 365. Turning on Email Routing for `glideslopepartners.com` itself would replace its MX records and stop your email. So Email Routing goes on a subdomain, `notify.glideslopepartners.com`, which only sends.
+**Important:** the domain's email runs on Microsoft 365. **Do not onboard `glideslopepartners.com` to Email _Routing_**: its "Verify DNS records" screen adds Cloudflare MX records and a new SPF record on the root domain, which would stop your email. The website only needs to *send*, so it uses Cloudflare **Email Sending** on the `notify.` subdomain.
 
-1. Dashboard → `glideslopepartners.com` → **Email → Email Routing → Get started**. When it asks for the domain, choose **Add subdomain** and enter `notify`. Let Cloudflare add the records it lists; they are all on `notify.` and leave the root domain alone. Check afterwards that the root domain's MX record still points to `glideslopepartners-com.mail.protection.outlook.com`.
-2. **Email Routing → Destination addresses → Add destination address:** `hello@glideslopepartners.com`. The verification email lands in the shared mailbox (step 0); either partner clicks the link.
-3. Store the destination as a secret on the mailer Worker:
+1. Dashboard → **Compute → Email Service → Email Sending → Onboard domain**. **Zone:** `glideslopepartners.com`. **Subdomain:** `notify`. **Continue**.
+2. On **Verify DNS records**, check that every hostname ends in `notify.glideslopepartners.com`: three MX and one SPF on `cf-bounce.notify.…`, DKIM on `cf-bounce._domainkey.notify.…`, and DMARC `p=reject` on `_dmarc.notify.…`. The strict DMARC policy covers only the subdomain, and the website's mail passes it because Cloudflare signs it. Then **Activate**.
+3. **Email Service → Email Routing → Destination addresses → Add destination address:** `hello@glideslopepartners.com`. This list belongs to the account and does not onboard the domain to routing. The verification email lands in the shared mailbox (step 0); either partner clicks the link. Sending to a verified destination address is free on every plan.
+4. Store the destination as a secret on the mailer Worker:
 
    ```bash
    cd workers/mailer
-   npx wrangler deploy
    npx wrangler secret put CONTACT_DESTINATION
    cd ../..
    ```
 
    For your records, also run `gh secret set CONTACT_DESTINATION` (CI does not read it).
-4. Send a test enquiry from the preview site. The email arrives from `website@notify.glideslopepartners.com` with Reply-To set to the person who wrote it.
+5. Send a test enquiry from the preview site. The email arrives from `website@notify.glideslopepartners.com` with Reply-To set to the person who wrote it.
 
 ## 7. Rate limit on the contact form
 
@@ -282,7 +282,7 @@ This uses your existing Claude plan and adds no cost.
 | `CF_WEB_ANALYTICS_SITE_TOKEN` | GitHub secret, optional | Step 5 alternative | Build (beacon) |
 | `TURNSTILE_SITE_KEY` | GitHub secret | Step 4 | Build |
 | `TURNSTILE_SECRET_KEY` | Pages project secret | Step 4 | Contact form handler |
-| `CONTACT_DESTINATION` | Mailer Worker secret | Step 6 | Enquiry email |
+| `CONTACT_DESTINATION` | Mailer Worker secret | Step 6 | Enquiry email (`hello@glideslopepartners.com`) |
 | `GSC_SERVICE_ACCOUNT_JSON` | GitHub secret | Step 10 | Sitemap submission, weekly report |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `REPORT_RECIPIENTS` | GitHub secrets | Step 12 | Weekly report, uptime alerts |
 | `ALERT_RECIPIENTS` | GitHub secret, optional | Step 12 | Uptime alerts |
