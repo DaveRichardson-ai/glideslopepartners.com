@@ -6,7 +6,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { openIssue, sendMail, SITE, summary } from './lib.mjs';
 
 const CHECKS = [
-  { path: '/', text: 'Deal value is decided between the data room and Day 1.' },
+  { path: '/', text: 'We plan and run separations, integrations and the transformation that follows.' },
   { path: '/contact/', text: 'Talk to a partner.' },
 ];
 const LIMIT_MS = 1000;

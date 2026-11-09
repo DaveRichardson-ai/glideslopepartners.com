@@ -13,3 +13,4 @@ playwright-report/
 *.log
 .pa11yci.json
 .claude/
+review/

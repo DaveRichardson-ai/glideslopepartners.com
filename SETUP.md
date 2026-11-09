@@ -258,7 +258,7 @@ The SMTP secrets below stay unset, and the jobs skip their own email with a warn
 
 ## 13. Uptime alternative (private repository only)
 
-Skip this if the repository is public. Otherwise: <https://uptimerobot.com> → free account → **Add New Monitor** → HTTP(s), `https://glideslopepartners.com/`, every 5 minutes, keyword `Deal value is decided`. Add a second for `/contact/` with keyword `Talk to a partner.` Alert contacts: Dave and Phil. Then delete `.github/workflows/uptime.yml`.
+Skip this if the repository is public. Otherwise: <https://uptimerobot.com> → free account → **Add New Monitor** → HTTP(s), `https://glideslopepartners.com/`, every 5 minutes, keyword `We plan and run separations`. Add a second for `/contact/` with keyword `Talk to a partner.` Alert contacts: Dave and Phil. Then delete `.github/workflows/uptime.yml`.
 
 ## 14. Optional: let auto-fix pull requests run CI
 
