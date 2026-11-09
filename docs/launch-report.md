@@ -131,7 +131,7 @@ Done on 9 November 2026: shared hello@ mailbox; public GitHub repository; Cloudf
 1. **GitHub ruleset for `main` and the `production` environment** (SETUP.md step 1).
 2. **Search Console:** URL inspection → `https://glideslopepartners.com/` → **Request indexing** (the API cannot do this).
 3. **Remove DNS Edit** from the Cloudflare API token now the cut-over is done (step 15).
-4. **Privacy policy check.** It says email is handled by Google, but the domain's mail runs on **Microsoft 365**. That is a statement about your business, so I have not changed it.
+4. **Privacy policy:** done. Email provider changed from Google to Microsoft on the owner's confirmation (9 November 2026).
 5. **Confirm the three engagement durations** (2–3 weeks, 2 weeks, 3–4 weeks) still hold.
 6. **Partner review of the three insights.** Each still contains `[verify …]` or `[check …]` notes; the build will not publish an article until they are resolved.
 7. **Dependabot pull request #1** (GitHub Actions versions, including major updates) needs a look; it removes the "Node.js 20 is deprecated" notices.
