@@ -81,13 +81,18 @@ jobs:
       # Own ports (not Playwright's 8788/8789, which may still be closing).
       - name: Start local Pages servers for pa11y and Lighthouse
         run: |
-          npx wrangler pages dev dist --port 8798 --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1 > wrangler-a.log 2>&1 &
-          npx wrangler pages dev dist-published --port 8799 --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1 > wrangler-b.log 2>&1 &
-          for i in $(seq 1 90); do
-            if curl -fsS -o /dev/null http://127.0.0.1:8798/ && curl -fsS -o /dev/null http://127.0.0.1:8799/; then echo "Servers up after $((i * 2)) s"; exit 0; fi
-            sleep 2
-          done
-          echo "Servers did not start. Logs:"; cat wrangler-a.log wrangler-b.log; exit 1
+          # One at a time, each with its own inspector port: started together,
+          # two wrangler processes race for the same port and one exits.
+          start() {
+            npx wrangler pages dev "$1" --port "$2" --inspector-port "$3" --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1 > "wrangler-$2.log" 2>&1 &
+            for i in $(seq 1 90); do
+              if curl -fsS -o /dev/null "http://127.0.0.1:$2/"; then echo "Server on $2 up after $((i * 2)) s"; return 0; fi
+              sleep 2
+            done
+            echo "Server on $2 did not start:"; cat "wrangler-$2.log"; return 1
+          }
+          start dist 8798 9298
+          start dist-published 8799 9299
 
       - name: pa11y (WCAG 2 AA, axe and HTML_CodeSniffer)
         env:

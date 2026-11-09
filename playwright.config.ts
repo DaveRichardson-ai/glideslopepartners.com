@@ -57,20 +57,20 @@ export default defineConfig({
     ? undefined
     : [
         {
-          command: 'npx wrangler pages dev dist --port 8788 --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1',
+          command: 'npx wrangler pages dev dist --port 8788 --inspector-port 9288 --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1',
           url: 'http://127.0.0.1:8788/',
           reuseExistingServer: true,
           timeout: 120_000,
         },
         {
-          command: 'npx wrangler pages dev dist --port 8790 --ip 127.0.0.1 --local-protocol https --binding DEV_SKIP_EMAIL=1',
+          command: 'npx wrangler pages dev dist --port 8790 --inspector-port 9290 --ip 127.0.0.1 --local-protocol https --binding DEV_SKIP_EMAIL=1',
           url: 'https://127.0.0.1:8790/',
           ignoreHTTPSErrors: true,
           reuseExistingServer: true,
           timeout: 120_000,
         },
         {
-          command: 'npx wrangler pages dev dist-published --port 8789 --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1',
+          command: 'npx wrangler pages dev dist-published --port 8789 --inspector-port 9289 --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1',
           url: 'http://127.0.0.1:8789/',
           reuseExistingServer: true,
           timeout: 120_000,
