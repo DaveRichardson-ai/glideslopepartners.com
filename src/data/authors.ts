@@ -1,6 +1,6 @@
 import type { ImageMetadata } from 'astro';
-import davidPortrait from '../../assets/portraits/david-richardson.jpg';
-import philipPortrait from '../../assets/portraits/philip-hyde.jpg';
+import davidPortrait from '../../assets/portraits/david-richardson-warm.jpg';
+import philipPortrait from '../../assets/portraits/philip-hyde-warm.jpg';
 
 export interface Author {
   id: 'david-richardson' | 'philip-hyde';
