@@ -31,7 +31,7 @@ Also added at the owner's request during the build:
 | Request | Result |
 | --- | --- |
 | Works in other browsers and on iPhones | **Pass.** 82 tests across Chromium, Google Chrome, Microsoft Edge, Firefox, Safari's engine (WebKit), iPhone 15, iPhone SE, iPad and Android (Pixel 7), on both builds. 34 tests repeated against the live Cloudflare preview. See "Cross-browser" below |
-| Use the brand sting video | On the About page, in a new "Why Glideslope" section. See "Brand video" below |
+| Use the brand sting video | On the About page, in a new "Behind the name" section. See "Brand video" below |
 | Add Melbourne and Brisbane | Added to the home-page eyebrow: "M&A transition · Transformation · Sydney · Melbourne · Brisbane". Also on the home-page social sharing image |
 
 ## Commands run
@@ -94,7 +94,7 @@ The cross-browser tests found three real problems, all fixed:
 
 ## Brand video
 
-`glideslope-brand-sting.mp4` (24 seconds, silent) sits on the About page in a new ink section, "Why Glideslope", between "Why we started" and "Partners". The text beside it is the brand guidelines' own explanation of the name, so no new claims are added.
+`glideslope-brand-sting.mp4` (24 seconds, silent) sits on the About page in a new ink section, "Behind the name", between "Why we started" and "Partners". The text beside it is the brand guidelines' own explanation of the name, so no new claims are added.
 
 - Re-encoded from 1080p High@5.0 (258 KB) to 720p H.264 High@4.0 (112 KB), with `faststart`, so every iPhone can play it.
 - No autoplay. It has controls, `playsinline` and `preload="none"`, so it costs nothing at page load and respects reduced motion.
