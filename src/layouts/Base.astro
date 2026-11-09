@@ -59,16 +59,8 @@ const beaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
     <meta name="twitter:image" content={ogImage} />
     <slot name="head" />
     {jsonLd.map((data) => <script type="application/ld+json" is:inline set:html={JSON.stringify(data)} />)}
-    {beaconToken && (
-      <script
-        type="module"
-        is:inline
-        src="https://static.cloudflareinsights.com/beacon.min.js"
-        data-cf-beacon={JSON.stringify({ token: beaconToken })}
-      />
-    )}
   </head>
-  <body>
+  <body data-cf-beacon={beaconToken || undefined}>
     <a class="skip-link" href="#main">Skip to content</a>
     <Header showInsights={showInsights} current={current} />
     <main id="main" tabindex="-1">

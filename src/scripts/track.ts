@@ -33,3 +33,15 @@ document.addEventListener(
   },
   { capture: true },
 );
+
+// Cloudflare Web Analytics, on the production domain only. The analytics site
+// is registered for glideslopepartners.com, and Cloudflare rejects (with
+// console errors) beacons from preview and local addresses.
+const beaconToken = document.body.dataset.cfBeacon;
+if (beaconToken && /(^|\.)glideslopepartners\.com$/.test(location.hostname)) {
+  const s = document.createElement('script');
+  s.defer = true;
+  s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  s.dataset.cfBeacon = JSON.stringify({ token: beaconToken });
+  document.head.append(s);
+}

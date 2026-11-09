@@ -10,6 +10,8 @@ test('every page loads with no console errors or warnings, no failed requests', 
   const problems: string[] = [];
   page.on('console', (m) => {
     if (m.type() !== 'error' && m.type() !== 'warning') return;
+    // Messages from inside Cloudflare's Turnstile iframe are third-party.
+    if (m.location().url.startsWith('https://challenges.cloudflare.com/')) return;
     // Chrome always logs the 404 status of a page served as a 404. That page must be a 404.
     if (page.url().includes('a-page-that-does-not-exist') && m.text().includes('status of 404')) return;
     problems.push(`${page.url()} console.${m.type()}: ${m.text()}`);
