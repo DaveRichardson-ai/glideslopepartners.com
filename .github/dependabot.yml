@@ -8,6 +8,10 @@ updates:
       time: '06:00'
       timezone: Australia/Sydney
     open-pull-requests-limit: 10
+    ignore:
+      # @astrojs/check supports TypeScript 5 and 6 only. Remove this when it accepts 7.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
     groups:
       minor-and-patch:
         update-types: [minor, patch]
