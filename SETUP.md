@@ -55,10 +55,31 @@ The domain's email runs on Microsoft 365. A **shared mailbox** costs nothing: it
 
 Created and pushed. Remaining settings:
 
-1. Open <https://github.com/DaveRichardson-ai/glideslopepartners.com/settings>.
-2. **Settings → General → Pull Requests:** tick **Allow auto-merge**. Dependabot updates need this.
-3. **Settings → Branches → Add branch ruleset** for `main`. Tick **Require a pull request before merging** and **Require status checks to pass**, then add the check **Build and verify**. This is what stops a failing change reaching production.
-4. **Settings → Environments → New environment** named `production`. It can stay empty. Add yourself as a required reviewer only if you want to approve each deploy by hand.
+Open <https://github.com/DaveRichardson-ai/glideslopepartners.com/settings>. You land on **General**.
+
+**A. Allow auto-merge** (Dependabot updates need it)
+
+1. On the **General** page, scroll down past **Features** to the **Pull Requests** section.
+2. Tick **Allow auto-merge**. Also tick **Automatically delete head branches** to keep the branch list tidy. Both save as soon as you tick them.
+
+**B. Protect `main`** (stops a failing change reaching production)
+
+Do this after the first CI run has finished: the check you need to pick only appears once it has run.
+
+1. Left sidebar, under **Code, planning, and automation**: click **Rulesets** (not Branches).
+2. **New ruleset → New branch ruleset**.
+3. **Ruleset name:** `main`. **Enforcement status:** Active.
+4. **Bypass list → Add bypass → Repository admin → Add selected.** This lets you, as the owner, still push straight to `main` in an emergency. Leave it empty if you would rather everything goes through a pull request.
+5. **Target branches → Add target → Include default branch.**
+6. Under **Rules**, leave **Restrict deletions** and **Block force pushes** ticked, then tick:
+   - **Require a pull request before merging.** Set **Required approvals** to **0**. GitHub does not let you approve your own pull request, so 1 would block you whenever you work alone.
+   - **Require status checks to pass → Add checks →** type `Build and verify` and pick it (source: GitHub Actions). Leave **Require branches to be up to date before merging** unticked.
+7. Click **Create** at the bottom.
+
+**C. Production environment**
+
+1. Left sidebar: **Environments → New environment**. Name: `production` → **Configure environment**.
+2. Leave everything as it is and click **Save protection rules**. Tick **Required reviewers** and add yourself only if you want to approve every deploy by hand.
 
 ## 2. Cloudflare API token
 
