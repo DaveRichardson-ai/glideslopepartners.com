@@ -78,16 +78,26 @@ jobs:
       - name: Playwright (console errors, axe, layout, forms, cross-browser and devices)
         run: npx playwright test
 
+      # Own ports (not Playwright's 8788/8789, which may still be closing).
       - name: Start local Pages servers for pa11y and Lighthouse
         run: |
-          npx wrangler pages dev dist --port 8788 --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1 > wrangler-8788.log 2>&1 &
-          npx wrangler pages dev dist-published --port 8789 --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1 > wrangler-8789.log 2>&1 &
-          npx --yes wait-on@8 -t 120000 http://127.0.0.1:8788/ http://127.0.0.1:8789/
+          npx wrangler pages dev dist --port 8798 --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1 > wrangler-a.log 2>&1 &
+          npx wrangler pages dev dist-published --port 8799 --ip 127.0.0.1 --binding DEV_SKIP_EMAIL=1 > wrangler-b.log 2>&1 &
+          for i in $(seq 1 90); do
+            if curl -fsS -o /dev/null http://127.0.0.1:8798/ && curl -fsS -o /dev/null http://127.0.0.1:8799/; then echo "Servers up after $((i * 2)) s"; exit 0; fi
+            sleep 2
+          done
+          echo "Servers did not start. Logs:"; cat wrangler-a.log wrangler-b.log; exit 1
 
       - name: pa11y (WCAG 2 AA, axe and HTML_CodeSniffer)
+        env:
+          PA11Y_BASES: http://127.0.0.1:8798,http://127.0.0.1:8799
         run: node scripts/pa11y.mjs
 
       - name: Lighthouse CI (mobile, every template, budgets)
+        env:
+          LHCI_BASE: http://127.0.0.1:8798
+          LHCI_BASE_PUBLISHED: http://127.0.0.1:8799
         run: |
           npx lhci autorun --config=lighthouserc.cjs
           node scripts/lighthouse-summary.mjs .lighthouseci/reports lighthouse-summary.md >> "$GITHUB_STEP_SUMMARY"
