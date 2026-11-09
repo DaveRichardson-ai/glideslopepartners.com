@@ -35,7 +35,8 @@ const table = (head, rows) =>
 
 /* ---------- Cloudflare Web Analytics ---------- */
 async function webAnalytics(range) {
-  const siteTag = env('CF_WEB_ANALYTICS_SITE_TAG');
+  // Accept the bare site tag, or a pasted URL or snippet that contains it.
+  const siteTag = env('CF_WEB_ANALYTICS_SITE_TAG')?.match(/[0-9a-f]{32}/i)?.[0];
   if (!cfReady() || !siteTag) return null;
   const q = `query($a:String!,$s:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$a}){
     total:rumPageloadEventsAdaptiveGroups(limit:1,filter:{siteTag:$s,date_geq:$from,date_leq:$to}){count sum{visits}}

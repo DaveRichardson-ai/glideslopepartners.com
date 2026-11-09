@@ -25,7 +25,8 @@ const canonical = new URL(pathname, site.url).href;
 const ogKey = pathname === '/' ? 'home' : pathname.replace(/^\/|\/$/g, '').replace(/\//g, '-');
 const ogImage = new URL(Astro.props.ogImage ?? `/og/${ogKey}.png`, site.url).href;
 const showInsights = await hasInsights();
-const beaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
+// Accept the bare token, or a pasted snippet that contains it.
+const beaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN?.match(/[0-9a-f]{32}/i)?.[0];
 ---
 
 <!doctype html>
