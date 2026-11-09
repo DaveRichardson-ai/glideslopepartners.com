@@ -103,6 +103,9 @@ jobs:
         env:
           LHCI_BASE: http://127.0.0.1:8798
           LHCI_BASE_PUBLISHED: http://127.0.0.1:8799
+          # Shared runners are noisy: the median of 5 runs per page keeps one
+          # slow sample from failing the build. Budgets are unchanged.
+          LHCI_RUNS: 5
         run: |
           npx lhci autorun --config=lighthouserc.cjs
           node scripts/lighthouse-summary.mjs .lighthouseci/reports lighthouse-summary.md >> "$GITHUB_STEP_SUMMARY"
