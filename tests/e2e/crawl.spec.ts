@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { sitePaths, visit } from './pages';
+import { isTurnstileNoise } from './third-party';
 
 const WIDTHS = [320, 375, 768, 1024, 1440];
 
@@ -8,18 +9,22 @@ test('every page loads with no console errors or warnings, no failed requests', 
   test.setTimeout(300_000);
   const paths = await sitePaths(request);
   const problems: string[] = [];
+  let target = '';
   page.on('console', (m) => {
     if (m.type() !== 'error' && m.type() !== 'warning') return;
-    // Messages from inside Cloudflare's Turnstile iframe are third-party.
-    if (m.location().url.startsWith('https://challenges.cloudflare.com/')) return;
+    // Third-party Turnstile noise (see third-party.ts).
+    if (isTurnstileNoise(target, m.text(), m.location().url)) return;
     // Chrome always logs the 404 status of a page served as a 404. That page must be a 404.
-    if (page.url().includes('a-page-that-does-not-exist') && m.text().includes('status of 404')) return;
+    if (target.includes('a-page-that-does-not-exist') && m.text().includes('status of 404')) return;
     problems.push(`${page.url()} console.${m.type()}: ${m.text()}`);
   });
-  page.on('pageerror', (e) => problems.push(`${page.url()} pageerror: ${e.message}`));
+  page.on('pageerror', (e) => {
+    if (isTurnstileNoise(target, e.message)) return;
+    problems.push(`${page.url()} pageerror: ${e.message}`);
+  });
   page.on('requestfailed', (r) => {
-    // Turnstile cancels its own blob: worker fetches inside its iframe; not a page fault.
-    if (r.url().startsWith('blob:https://challenges.cloudflare.com/')) return;
+    // Turnstile's own requests (blob: workers, challenge servers) are not page faults.
+    if (/^(blob:)?https:\/\/[a-z0-9.-]*challenges\.cloudflare\.com\//.test(r.url())) return;
     problems.push(`${page.url()} request failed: ${r.url()} ${r.failure()?.errorText}`);
   });
   page.on('response', (r) => {
@@ -30,6 +35,7 @@ test('every page loads with no console errors or warnings, no failed requests', 
   });
 
   for (const path of paths) {
+    target = path;
     const res = await visit(page, path);
     const expected = path.includes('does-not-exist') ? 404 : 200;
     expect(res?.status(), path).toBe(expected);

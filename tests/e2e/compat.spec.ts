@@ -2,19 +2,21 @@
 // engine) and emulated iPhone, iPhone SE, iPad and Android devices.
 import { expect, test } from '@playwright/test';
 import { sitePaths, visit } from './pages';
+import { isTurnstileNoise } from './third-party';
 
 test('every page renders and works in this browser', async ({ page, request }, info) => {
   test.setTimeout(300_000);
   const paths = await sitePaths(request);
   const problems: string[] = [];
   let target = '';
-  page.on('pageerror', (e) => problems.push(`${page.url()} pageerror: ${e.message}`));
+  page.on('pageerror', (e) => {
+    if (isTurnstileNoise(target, e.message)) return;
+    problems.push(`${page.url()} pageerror: ${e.message}`);
+  });
   page.on('console', (m) => {
     if (m.type() !== 'error') return;
-    // Messages from inside Cloudflare's Turnstile iframe are third-party; we
-    // cannot change that code. Anything from our own pages still fails.
-    if (m.location().url.startsWith('https://challenges.cloudflare.com/')) return;
     const t = m.text();
+    if (isTurnstileNoise(target, t, m.location().url)) return;
     // The 404 page is served with status 404 by design; browsers log that status.
     if (target.includes('a-page-that-does-not-exist') && /404/.test(t)) return;
     problems.push(`${page.url()} console.error: ${t}`);
