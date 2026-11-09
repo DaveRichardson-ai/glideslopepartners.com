@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Site header</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<header style="background: #0F1C2E; border-bottom: 1px solid #22324A; font-family: Inter, Arial, sans-serif">
+<nav aria-label="Primary" style="max-width: 1200px; margin: 0 auto; padding: 20px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<a href="Main.dc.html" aria-label="Glideslope Partners home" style="display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none">
+<span style="font-family: 'Inter Tight', sans-serif; font-weight: 500; font-size: 26px; letter-spacing: -0.03em; color: #FFFFFF; line-height: 1">glideslope</span>
+<svg aria-hidden="true" width="27" height="5" viewBox="0 0 58 10"><circle cx="5" cy="5" r="4.5" fill="#FFFFFF"></circle><circle cx="21" cy="5" r="4.5" fill="#FFFFFF"></circle><circle cx="37" cy="5" r="4.5" fill="#D9A441"></circle><circle cx="53" cy="5" r="4.5" fill="#D9A441"></circle></svg>
+</a>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 28px; font-size: 15px">
+<a href="Services.dc.html" style="color: #D6DCE3; text-decoration: none">Services</a>
+<a href="About.dc.html" style="color: #D6DCE3; text-decoration: none">About</a>
+<a href="Insights.dc.html" style="color: #D6DCE3; text-decoration: none">Insights</a>
+<a href="Contact.dc.html" style="color: #0F1C2E; background: #D9A441; text-decoration: none; font-weight: 600; padding: 12px 18px; border-radius: 4px; min-height: 44px; box-sizing: border-box; display: inline-flex; align-items: center">Talk to a partner</a>
+</div>
+</nav>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":86}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

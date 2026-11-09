@@ -1,0 +1,36 @@
+name: Dependabot auto-merge
+
+# Patch and minor updates merge automatically once CI passes (branch protection
+# must require the "Build and verify" check). Major updates get a needs-human issue.
+on: pull_request_target
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  automerge:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - id: meta
+        uses: dependabot/fetch-metadata@v2
+      - name: Enable auto-merge for patch and minor
+        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --squash "$PR"
+      - name: Ask a person to review a major update
+        if: steps.meta.outputs.update-type == 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.html_url }}
+          TITLE: ${{ github.event.pull_request.title }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh label create needs-human --color A63D2A --description "Automation could not fix this; the owner needs to act" --repo "$REPO" 2>/dev/null || true
+          gh issue create --repo "$REPO" --label needs-human --assignee "${REPO%%/*}" \
+            --title "Major dependency update: $TITLE" \
+            --body "Dependabot opened a major-version update: $PR. Major updates can change behaviour, so they are not merged automatically. Read the release notes, check the CI result on the PR, then merge or close it."

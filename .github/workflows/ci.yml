@@ -1,0 +1,220 @@
+name: CI and deploy
+
+# Every pull request and push to main runs the full gate. Production deploys
+# only from main, only after every check passes, and rolls back automatically
+# if the live checks fail straight after the deploy.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 24
+  CF_PAGES_PROJECT: glideslope
+
+jobs:
+  verify:
+    name: Build and verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Dependency audit (high and critical)
+        run: npm audit --audit-level=high
+
+      - name: Type check (astro check + Functions)
+        run: npm run check
+
+      - name: Unit tests
+        run: npx vitest run
+
+      - name: Build guards (published article with no date or unresolved note must fail)
+        run: node scripts/test-insight-states.mjs
+
+      - name: Build both states (as is, and with fixture articles published)
+        run: bash scripts/build-states.sh
+
+      - name: HTML validation
+        run: npx html-validate "dist/**/*.html" "dist-published/**/*.html"
+
+      - name: Install lychee
+        uses: taiki-e/install-action@v2
+        with:
+          tool: lychee
+
+      - name: Internal links (blocking)
+        run: |
+          bash scripts/check-links.sh dist --offline
+          bash scripts/check-links.sh dist-published --offline
+
+      - name: External links (warning only)
+        continue-on-error: true
+        run: |
+          bash scripts/check-links.sh dist
+          bash scripts/check-links.sh dist-published
+
+      - name: Email links (address and MX record)
+        run: node scripts/check-mailto.mjs dist
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Playwright (console errors, axe, layout, forms, cross-browser and devices)
+        run: npx playwright test
+
+      - name: Start local Pages servers for pa11y and Lighthouse
+        run: |
+          npx wrangler pages dev dist --port 8788 --ip 127.0.0.1 > wrangler-8788.log 2>&1 &
+          npx wrangler pages dev dist-published --port 8789 --ip 127.0.0.1 > wrangler-8789.log 2>&1 &
+          npx --yes wait-on@8 -t 120000 http://127.0.0.1:8788/ http://127.0.0.1:8789/
+
+      - name: pa11y (WCAG 2 AA, axe and HTML_CodeSniffer)
+        run: node scripts/pa11y.mjs
+
+      - name: Lighthouse CI (mobile, every template, budgets)
+        run: |
+          npx lhci autorun --config=lighthouserc.cjs
+          node scripts/lighthouse-summary.mjs .lighthouseci/reports lighthouse-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+            .lighthouseci/
+            lighthouse-summary.md
+          retention-days: 14
+
+  preview:
+    name: Preview deploy and header check
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Check Cloudflare secrets
+        id: secrets
+        run: |
+          if [ -n "${{ secrets.CLOUDFLARE_API_TOKEN }}" ] && [ -n "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID not set; skipping deploys (see SETUP.md)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.secrets.outputs.ready == 'true'
+        run: npm ci
+      - name: Build with production keys
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
+          PUBLIC_CF_BEACON_TOKEN: ${{ secrets.CF_WEB_ANALYTICS_SITE_TOKEN }}
+        run: npx astro build
+      - name: Deploy preview
+        id: deploy
+        if: steps.secrets.outputs.ready == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=${{ env.CF_PAGES_PROJECT }} --branch=preview-${{ github.event.pull_request.number || github.run_number }} --commit-dirty=true
+      - name: Check headers, redirects and links on the preview
+        if: steps.secrets.outputs.ready == 'true'
+        run: node scripts/ops/site-check.mjs "${{ steps.deploy.outputs.deployment-url }}"
+      - name: Cross-browser smoke test on the preview (Cloudflare edge)
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          BASE_URL: ${{ steps.deploy.outputs.deployment-url }}
+        run: |
+          npx playwright install --with-deps chromium webkit
+          npx playwright test compat site --project=default --project=iphone-15 --grep-invert "contact form submits|drafts only"
+
+  production:
+    name: Deploy to production
+    needs: [verify, preview]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    permissions:
+      contents: read
+      issues: write
+    env:
+      SITE_URL: ${{ vars.PRODUCTION_URL || 'https://glideslope-d65.pages.dev' }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Check Cloudflare secrets
+        id: secrets
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then echo "ready=true" >> "$GITHUB_OUTPUT"; else
+            echo "::warning::Cloudflare secrets not set; production deploy skipped (see SETUP.md)."; echo "ready=false" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.secrets.outputs.ready == 'true'
+        run: npm ci
+      - name: Build with production keys
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
+          PUBLIC_CF_BEACON_TOKEN: ${{ secrets.CF_WEB_ANALYTICS_SITE_TOKEN }}
+        run: npx astro build
+      - name: Save the current live sitemap
+        if: steps.secrets.outputs.ready == 'true'
+        run: curl -fsS "$SITE_URL/sitemap.xml" -o previous-sitemap.xml || true
+      - name: Deploy the enquiry mailer Worker
+        if: steps.secrets.outputs.ready == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: workers/mailer
+          command: deploy
+      - name: Deploy to production
+        if: steps.secrets.outputs.ready == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=${{ env.CF_PAGES_PROJECT }} --branch=main --commit-dirty=true
+      - name: Check production
+        id: live
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          sleep 20
+          node scripts/ops/site-check.mjs "$SITE_URL"
+      - name: Roll back and open an issue
+        if: failure() && steps.live.outcome == 'failure'
+        run: node scripts/ops/rollback.mjs site-check.json
+      - name: Resubmit the sitemap to Search Console if it changed
+        if: steps.live.outcome == 'success'
+        run: node scripts/ops/gsc-submit.mjs previous-sitemap.xml dist/sitemap.xml

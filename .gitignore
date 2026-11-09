@@ -1,0 +1,15 @@
+node_modules/
+dist/
+dist-*/
+.astro/
+.wrangler/
+.dev.vars
+.env
+.env.*
+!.env.example
+test-results/
+playwright-report/
+.lighthouseci/
+*.log
+.pa11yci.json
+.claude/

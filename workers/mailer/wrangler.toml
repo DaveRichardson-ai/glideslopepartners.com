@@ -1,0 +1,16 @@
+name = "glideslope-mailer"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+# No public URL: only the Pages project's service binding can call it.
+workers_dev = false
+preview_urls = false
+
+[vars]
+# Email Routing is enabled on the notify. subdomain only, so the apex MX records
+# (Microsoft 365) are never touched. See SETUP.md step 6.
+FROM_ADDRESS = "website@notify.glideslopepartners.com"
+
+# Sends only to verified Email Routing destinations. The destination itself is
+# the CONTACT_DESTINATION secret: `npx wrangler secret put CONTACT_DESTINATION`.
+[[send_email]]
+name = "EMAIL"

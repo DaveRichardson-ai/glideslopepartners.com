@@ -1,0 +1,134 @@
+---
+import { render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import InsightCard from '../../components/InsightCard.astro';
+import { authors } from '../../data/authors';
+import { formatDate, site, topicLabel } from '../../data/site';
+import { getPublishedInsights, readingTime, type Insight } from '../../lib/insights';
+
+export async function getStaticPaths() {
+  const insights = await getPublishedInsights();
+  return insights.map((insight) => ({ params: { slug: insight.id }, props: { insight } }));
+}
+
+interface Props {
+  insight: Insight;
+}
+const { insight } = Astro.props;
+const d = insight.data;
+const author = authors[d.author];
+const { Content } = await render(insight);
+const minutes = readingTime(insight.body);
+const url = `${site.url}/insights/${insight.id}/`;
+const topic = topicLabel(d.topic);
+
+const others = (await getPublishedInsights()).filter((i) => i.id !== insight.id);
+const related = [...others.filter((i) => i.data.topic === d.topic), ...others.filter((i) => i.data.topic !== d.topic)].slice(0, 2);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: d.title,
+    description: d.description,
+    inLanguage: 'en-AU',
+    mainEntityOfPage: url,
+    url,
+    image: `${site.url}/og/insights-${insight.id}.png`,
+    datePublished: d.publishDate.toISOString(),
+    dateModified: (d.updatedDate ?? d.publishDate).toISOString(),
+    author: { '@type': 'Person', name: author.name, jobTitle: author.role, url: author.linkedin },
+    publisher: {
+      '@type': 'Organization',
+      '@id': `${site.url}/#organisation`,
+      name: site.name,
+      logo: { '@type': 'ImageObject', url: `${site.url}/icon-512.png` },
+    },
+    articleSection: topic,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${site.url}/` },
+      { '@type': 'ListItem', position: 2, name: 'Insights', item: `${site.url}/insights/` },
+      { '@type': 'ListItem', position: 3, name: topic, item: `${site.url}/insights/topic/${d.topic}/` },
+      { '@type': 'ListItem', position: 4, name: d.title, item: url },
+    ],
+  },
+];
+const shortTitle = d.title.length > 38 ? `${d.title.slice(0, 36).replace(/\s+\S*$/, '')}…` : d.title;
+---
+
+<Base title={`${shortTitle} — Glideslope Partners`} description={d.description} ogType="article" jsonLd={jsonLd} current="/insights/">
+  <Fragment slot="head">
+    <meta property="article:published_time" content={d.publishDate.toISOString()} />
+    {d.updatedDate && <meta property="article:modified_time" content={d.updatedDate.toISOString()} />}
+    <meta property="article:author" content={author.linkedin} />
+    <meta property="article:section" content={topic} />
+  </Fragment>
+  <article class="article">
+    <header class="narrow article-head">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/insights/">Insights</a></li>
+          <li><a href={`/insights/topic/${d.topic}/`}>{topic}</a></li>
+        </ol>
+      </nav>
+      <h1>{d.title}</h1>
+      <p class="standfirst">{d.description}</p>
+      <div class="byline">
+        <Image src={author.portrait} alt="" width={44} height={44} densities={[1, 2]} format="webp" loading="eager" />
+        <span><strong>{author.name}</strong>, {author.role}</span>
+        <span aria-hidden="true">·</span>
+        <time datetime={d.publishDate.toISOString().slice(0, 10)}>{formatDate(d.publishDate)}</time>
+        {
+          d.updatedDate && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>
+                Updated <time datetime={d.updatedDate.toISOString().slice(0, 10)}>{formatDate(d.updatedDate)}</time>
+              </span>
+            </>
+          )
+        }
+        <span aria-hidden="true">·</span>
+        <span>{minutes} min read</span>
+      </div>
+    </header>
+
+    <div class="narrow article-body">
+      <div class="prose">
+        <Content />
+      </div>
+
+      <aside class="author-box" aria-label="About the author">
+        <Image src={author.portrait} alt={author.name} width={72} height={72} densities={[1, 2]} format="webp" />
+        <div>
+          <p class="name">{author.name}, {author.role}</p>
+          <p class="line">{author.authorBox}</p>
+          <a class="text-link" href="/contact/" data-track="cta" data-track-label={`article-talk-to-${author.id}`}>
+            Talk to {author.firstName} about your transaction
+          </a>
+        </div>
+      </aside>
+      <p class="disclaimer">This article is general commentary and is not legal or financial advice.</p>
+    </div>
+  </article>
+
+  {
+    related.length > 0 && (
+      <section class="raised related">
+        <div class="wrap">
+          <h2>More insights</h2>
+          <div class="grid cards">
+            {related.map((i) => (
+              <InsightCard insight={i} variant="related" />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</Base>

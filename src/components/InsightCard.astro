@@ -1,0 +1,25 @@
+---
+import type { Insight } from '../lib/insights';
+import { insightUrl } from '../lib/insights';
+import { authors } from '../data/authors';
+import { formatDate, topicLabel } from '../data/site';
+interface Props {
+  insight: Insight;
+  variant?: 'home' | 'index' | 'related';
+}
+const { insight, variant = 'index' } = Astro.props;
+const d = insight.data;
+const author = authors[d.author];
+const meta =
+  variant === 'home'
+    ? `${topicLabel(d.topic)} · ${formatDate(d.publishDate)}`
+    : variant === 'related'
+      ? `${topicLabel(d.topic)} · ${author.name}`
+      : `${topicLabel(d.topic)} · ${author.name} · ${formatDate(d.publishDate)}`;
+---
+
+<a class:list={['card', { 'card--lg': variant === 'index' }]} href={insightUrl(insight)} data-track="insight-card" data-track-label={insight.id}>
+  <p class="meta">{meta}</p>
+  <h3>{d.title}</h3>
+  {variant !== 'related' && <p>{d.description}</p>}
+</a>

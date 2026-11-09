@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+import InsightCard from './InsightCard.astro';
+import { authors } from '../data/authors';
+import { formatDate, site, topicLabel } from '../data/site';
+import { insightUrl, type Insight } from '../lib/insights';
+
+interface Props {
+  insights: Insight[];
+  topics: string[];
+  topic?: string;
+}
+const { insights, topics, topic } = Astro.props;
+const [feature, ...rest] = insights;
+const label = topic ? topicLabel(topic) : undefined;
+const path = topic ? `/insights/topic/${topic}/` : '/insights/';
+
+const title = label ? `${label} insights — Glideslope Partners` : 'Insights — Glideslope Partners';
+const description = label
+  ? `Partner-written notes on ${label.toLowerCase()} in Australian financial services M&A: separations, integrations, TSAs and transformation.`
+  : 'Practical notes on separations, integrations, TSAs and transformation in Australian financial services, written by a Glideslope partner.';
+
+const crumbs = [
+  { name: 'Home', item: `${site.url}/` },
+  { name: 'Insights', item: `${site.url}/insights/` },
+  ...(label ? [{ name: label, item: `${site.url}${path}` }] : []),
+];
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: c.item })),
+  },
+];
+const fa = feature ? authors[feature.data.author] : undefined;
+---
+
+<Base title={title} description={description} jsonLd={jsonLd} current="/insights/">
+  <section class="wrap insights-head">
+    <p class="eyebrow">Insights</p>
+    <h1 class="title">{label ? `What we are seeing on deals: ${label.toLowerCase()}.` : 'What we are seeing on deals.'}</h1>
+    <p class="lead">
+      Practical notes on separations, integrations, TSAs and transformation in Australian financial services. One new piece
+      a month, written by a partner.
+    </p>
+    <nav class="chips" aria-label="Topics">
+      <a class="chip" href="/insights/" aria-current={!topic ? 'page' : undefined}>All</a>
+      {
+        topics.map((t) => (
+          <a class="chip" href={`/insights/topic/${t}/`} aria-current={t === topic ? 'page' : undefined}>
+            {topicLabel(t)}
+          </a>
+        ))
+      }
+    </nav>
+  </section>
+
+  <section class="wrap insights-list">
+    {
+      feature && fa && (
+        <a class="feature grid" href={insightUrl(feature)} data-track="insight-card" data-track-label={feature.id}>
+          <div>
+            <p class="meta">
+              {topicLabel(feature.data.topic)} · {fa.name} · {formatDate(feature.data.publishDate)}
+            </p>
+            <h2>{feature.data.title}</h2>
+            <p>{feature.data.description}</p>
+          </div>
+          <span class="cta">Read the paper</span>
+        </a>
+      )
+    }
+    {
+      rest.length > 0 && (
+        <div class="grid cards">
+          {rest.map((i) => (
+            <InsightCard insight={i} variant="index" />
+          ))}
+        </div>
+      )
+    }
+  </section>
+</Base>

@@ -1,0 +1,2 @@
+# Copy to .dev.vars for `npm run preview` (wrangler pages dev).
+DEV_SKIP_EMAIL=1

@@ -1,0 +1,22 @@
+---
+// The four approach lights. Decorative unless a label is given.
+type Light = "white" | "amber" | "ink" | "amber-deep";
+interface Props {
+  width: number;
+  height: number;
+  colours: [Light, Light, Light, Light];
+  label?: string;
+}
+const { width, height, colours, label } = Astro.props;
+---
+
+<svg
+  width={width}
+  height={height}
+  viewBox="0 0 58 10"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  {colours.map((c, i) => <circle cx={5 + i * 16} cy="5" r="4.5" class={`light light--${c}`} />)}
+</svg>

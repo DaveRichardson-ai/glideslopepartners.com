@@ -1,0 +1,15 @@
+---
+// /insights/ — generated only when at least one article is published.
+import InsightsIndex from '../../components/InsightsIndex.astro';
+import { getPublishedInsights, publishedTopics } from '../../lib/insights';
+
+export async function getStaticPaths() {
+  const insights = await getPublishedInsights();
+  return insights.length ? [{ params: { index: undefined } }] : [];
+}
+
+const insights = await getPublishedInsights();
+const topics = await publishedTopics();
+---
+
+<InsightsIndex insights={insights} topics={topics} />

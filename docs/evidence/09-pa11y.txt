@@ -1,0 +1,20 @@
+ > http://127.0.0.1:8788/ - 0 errors
+ > http://127.0.0.1:8788/about/ - 0 errors
+ > http://127.0.0.1:8788/contact/ - 0 errors
+ > http://127.0.0.1:8788/privacy/ - 0 errors
+ > http://127.0.0.1:8788/services/ - 0 errors
+ > http://127.0.0.1:8788/contact/thanks/ - 0 errors
+ > http://127.0.0.1:8789/ - 0 errors
+ > http://127.0.0.1:8789/about/ - 0 errors
+ > http://127.0.0.1:8789/contact/ - 0 errors
+ > http://127.0.0.1:8789/insights/ - 0 errors
+ > http://127.0.0.1:8789/insights/stranded-cost/ - 0 errors
+ > http://127.0.0.1:8789/insights/topic/diligence/ - 0 errors
+ > http://127.0.0.1:8789/insights/topic/regulation/ - 0 errors
+ > http://127.0.0.1:8789/insights/topic/wealth/ - 0 errors
+ > http://127.0.0.1:8789/insights/tsa-material-arrangement/ - 0 errors
+ > http://127.0.0.1:8789/insights/wealth-re-entry/ - 0 errors
+ > http://127.0.0.1:8789/privacy/ - 0 errors
+ > http://127.0.0.1:8789/services/ - 0 errors
+ > http://127.0.0.1:8789/contact/thanks/ - 0 errors
+✔ 19/19 URLs passed

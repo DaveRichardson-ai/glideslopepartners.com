@@ -1,0 +1,6 @@
+== dist (internal + external)
+🔍 213 Total (in 1s 90ms) 🔗 65 Unique ✅ 200 OK 🚫 0 Errors 👻 13 Excluded 🔀 4 Redirects
+== dist-published (internal + external)
+🔍 469 Total (in 1s 329ms) 🔗 102 Unique ✅ 449 OK 🚫 0 Errors 👻 20 Excluded 🔀 7 Redirects
+== mailto
+OK    hello@glideslopepartners.com on 13 pages; MX glideslopepartners-com.mail.protection.outlook.com

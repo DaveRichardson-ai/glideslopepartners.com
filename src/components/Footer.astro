@@ -1,0 +1,36 @@
+---
+import { site } from '../data/site';
+interface Props {
+  showInsights: boolean;
+}
+const { showInsights } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap grid cols">
+    <div class="col brand-col">
+      <img src="/brand/glideslope-wordmark-on-dark.svg" alt="Glideslope Partners" width="128" height="23" loading="lazy" />
+      <span>M&amp;A transition and transformation advisory. Sydney, New South Wales.</span>
+    </div>
+    <nav aria-label="Footer">
+      <ul class="col">
+        <li><a href="/services/">Services</a></li>
+        <li><a href="/about/">About</a></li>
+        {showInsights && <li><a href="/insights/">Insights</a></li>}
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </nav>
+    <ul class="col">
+      <li>
+        <a class="email" href={`mailto:${site.email}`} data-track="mailto" data-track-label="footer-email">{site.email}</a>
+      </li>
+      <li><a href={site.linkedin} rel="noopener" data-track="outbound" data-track-label="footer-linkedin">LinkedIn</a></li>
+      <li><a href={site.clarityIntel} rel="noopener" data-track="outbound" data-track-label="footer-clarityintel">ClarityIntel</a></li>
+    </ul>
+  </div>
+  <div class="wrap legal">
+    <span>© {year} Glideslope Partners · ABN {site.abn}</span>
+    <a href="/privacy/">Privacy policy</a>
+  </div>
+</footer>

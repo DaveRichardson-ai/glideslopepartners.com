@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Contact</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#0F1C2E}a{color:#E8B866}a:hover{color:#F3D49C}input,select,textarea{font:inherit}</style>
+</helmet>
+<div style="font-family: Inter, Arial, sans-serif; color: #E9ECEF; background: #0F1C2E; font-size: 17px; line-height: 1.6">
+<dc-import name="Header" hint-size="100%,86px"></dc-import>
+<section style="max-width: 1200px; margin: 0 auto; padding: 96px 24px 112px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 64px">
+<div>
+<p style="margin: 0 0 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #E8B866">Contact</p>
+<h1 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 600; font-size: clamp(36px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.025em; color: #FFFFFF">Talk to a partner.</h1>
+<p style="margin: 24px 0 0; color: #C9D1DA">A conversation is confidential and carries no obligation. If you are pre-announcement, say so and it stays with the partners.</p>
+<h2 style="margin: 40px 0 12px; font-size: 18px; font-weight: 600; color: #FFFFFF">What happens next</h2>
+<ol style="margin: 0; padding-left: 20px; color: #C9D1DA; display: grid; gap: 8px">
+<li>A partner reads your message and replies personally.</li>
+<li>We arrange a call to understand the transaction or programme.</li>
+<li>If we can help, we propose a fixed-scope first step.</li>
+</ol>
+<div style="margin-top: 40px; display: flex; flex-direction: column; gap: 10px">
+<a href="mailto:hello@glideslopepartners.com">hello@glideslopepartners.com</a>
+<span style="color: #C9D1DA">Sydney, New South Wales</span>
+<a href="https://www.linkedin.com/company/glideslope-partners">LinkedIn</a>
+</div>
+</div>
+<form aria-label="Contact form" style="display: grid; gap: 18px; align-content: start">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px">
+<label style="display: grid; gap: 6px; font-size: 14px; color: #C9D1DA">Name
+<input type="text" name="name" autocomplete="name" required style="min-height: 48px; padding: 0 14px; background: #162538; border: 1px solid #3A4E69; border-radius: 4px; color: #FFFFFF"></label>
+<label style="display: grid; gap: 6px; font-size: 14px; color: #C9D1DA">Organisation
+<input type="text" name="organisation" autocomplete="organization" style="min-height: 48px; padding: 0 14px; background: #162538; border: 1px solid #3A4E69; border-radius: 4px; color: #FFFFFF"></label>
+</div>
+<label style="display: grid; gap: 6px; font-size: 14px; color: #C9D1DA">Work email
+<input type="email" name="email" autocomplete="email" required style="min-height: 48px; padding: 0 14px; background: #162538; border: 1px solid #3A4E69; border-radius: 4px; color: #FFFFFF"></label>
+<label style="display: grid; gap: 6px; font-size: 14px; color: #C9D1DA">Where is the transaction?
+<select name="stage" style="min-height: 48px; padding: 0 14px; background: #162538; border: 1px solid #3A4E69; border-radius: 4px; color: #FFFFFF">
+<option>Pre-signing</option>
+<option>Signed, pre-completion</option>
+<option>Post-completion</option>
+<option>Not deal-related</option>
+</select></label>
+<label style="display: grid; gap: 6px; font-size: 14px; color: #C9D1DA">What are you working on?
+<textarea name="message" rows="6" required style="padding: 12px 14px; background: #162538; border: 1px solid #3A4E69; border-radius: 4px; color: #FFFFFF; resize: vertical"></textarea></label>
+<div role="img" aria-label="Spam check placeholder" style="height: 65px; max-width: 300px; border: 1px dashed #3A4E69; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #A9B3BF">Cloudflare Turnstile check</div>
+<p style="margin: 0; font-size: 13px; color: #A9B3BF">We use your details only to reply. See our <a href="Privacy.dc.html">privacy policy</a>.</p>
+<button type="submit" style="justify-self: start; min-height: 48px; padding: 0 28px; background: #D9A441; color: #0F1C2E; border: 0; border-radius: 4px; font-weight: 600; font-size: 16px; cursor: pointer">Send message</button>
+</form>
+</section>
+<dc-import name="Footer" hint-size="100%,300px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

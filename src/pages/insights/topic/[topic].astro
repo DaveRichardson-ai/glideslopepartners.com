@@ -1,0 +1,16 @@
+---
+// /insights/topic/{topic}/ — one page per topic that has published articles.
+import InsightsIndex from '../../../components/InsightsIndex.astro';
+import { getPublishedInsights, publishedTopics } from '../../../lib/insights';
+
+export async function getStaticPaths() {
+  const topics = await publishedTopics();
+  return topics.map((topic) => ({ params: { topic } }));
+}
+
+const { topic } = Astro.params;
+const insights = (await getPublishedInsights()).filter((i) => i.data.topic === topic);
+const topics = await publishedTopics();
+---
+
+<InsightsIndex insights={insights} topics={topics} topic={topic} />

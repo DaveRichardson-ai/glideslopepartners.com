@@ -1,0 +1,17 @@
+# npm audit report
+
+fflate  0.7.0 - 0.7.4
+Severity: moderate
+fflate unzipSync can enter an infinite loop when parsing malformed ZIP64 archives - https://github.com/advisories/GHSA-px8p-9vwx-vf98
+fix available via `npm audit fix --force`
+Will install satori@0.32.0, which is a breaking change
+node_modules/fflate
+  satori  >=0.33.0
+  Depends on vulnerable versions of fflate
+  node_modules/satori
+
+2 moderate severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+exit 0

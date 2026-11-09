@@ -1,0 +1,171 @@
+---
+import Base from '../layouts/Base.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+const transition = [
+  {
+    title: 'Transition planning & design',
+    intro: 'Design the future-state operating model and the route to it, from diligence through Day 1 to full separation or integration.',
+    items: [
+      'Future-state design across technology, people, process and data',
+      'Separation Management Plans and integration roadmaps',
+      'Due diligence support across technology, operations and vendors',
+      'Financial modelling, cost to achieve and business case',
+      'Transition risk assessment and readiness reviews',
+    ],
+  },
+  {
+    title: 'Separation & integration delivery',
+    intro: 'Mobilise and run the programme, with a partner leading it and specialists where they are needed.',
+    items: [
+      'Transition management office stand-up and governance',
+      'Programme leadership and delivery',
+      'Specialist resources: business analysis, architecture, project management, change',
+      'Synergy tracking and realisation reporting',
+      'Lessons learned and handover to business as usual',
+    ],
+  },
+  {
+    title: 'TSA design & governance',
+    intro: 'Transitional service agreements that work as operating contracts and meet CPS 230 as material arrangements.',
+    items: [
+      'Service schedules mapped to critical operations',
+      'Pricing, service levels and reporting',
+      'Exit plans and transition-out terms',
+      'APRA notification and continuity planning',
+      'Ongoing TSA governance through to exit',
+    ],
+  },
+  {
+    title: 'Vendor-side separation readiness',
+    intro: 'Make a business separable before the sale process, so entanglement does not become a price chip.',
+    items: [
+      'Entanglement mapping across systems, people, contracts and data',
+      'Stranded cost sizing and cost-out plan',
+      'Draft TSA scope and pricing for the data room',
+      'Buyer diligence support',
+    ],
+  },
+];
+
+const transformation = [
+  {
+    title: 'Technology transformation',
+    intro: 'Move a technology estate from ambiguity to a funded, mobilised programme.',
+    items: [
+      'Technology and AI diagnostic, due diligence and readiness',
+      'Target-state architecture, platform design and roadmap',
+      'Business case and investment sizing',
+      'Programme mobilisation, governance and execution oversight',
+    ],
+  },
+  {
+    title: 'Operating model & BPO / ITO',
+    intro: 'Redesign how work is done and who does it, then move it safely.',
+    items: [
+      'Operating model design, including blended human and AI workforces',
+      'Outsourcing strategy and vendor selection',
+      'Outsourcing transition and cutover',
+      'Insourcing and contract exit',
+    ],
+  },
+  {
+    title: 'Programme assurance',
+    intro: 'An independent view for boards and executives on programmes in flight.',
+    items: [
+      'Stage-gate reviews for transitions and outsourcing',
+      'Vendor contract and delivery assurance',
+      'Risk and readiness reporting to sponsors',
+    ],
+  },
+  {
+    title: 'AI in operations',
+    intro: 'Put AI to work in regulated operations, with the controls APRA expects.',
+    items: [
+      'Use-case selection and value sizing',
+      'Workforce and process redesign',
+      'Governance, model risk and CPS 230 / CPS 234 alignment',
+    ],
+  },
+];
+
+const practices = [
+  { id: 'transition', name: 'M&A Transition', span: 'Diligence → Day 2', offerings: transition },
+  { id: 'transformation', name: 'Transformation', span: 'Post-deal or standalone', offerings: transformation },
+];
+---
+
+<Base
+  title="Services — Glideslope Partners"
+  description="M&A Transition from diligence to TSA exit, and Transformation of operating models and technology. Three fixed-scope ways to start, each led by a partner."
+  current="/services/"
+>
+  <section class="ink page-hero">
+    <div class="wrap">
+      <p class="eyebrow">Services</p>
+      <h1 class="title">Two practices, one team. Deal-driven or standalone.</h1>
+      <p class="lead">
+        M&amp;A Transition covers the deal from diligence to TSA exit. Transformation covers the operating model and
+        technology change that follows a deal, or stands on its own.
+      </p>
+      <nav class="anchors" aria-label="On this page">
+        <a class="btn btn--outline btn--sm" href="#transition">M&amp;A Transition</a>
+        <a class="btn btn--outline btn--sm" href="#transformation">Transformation</a>
+        <a class="btn btn--outline btn--sm" href="#start">Ways to start</a>
+      </nav>
+    </div>
+  </section>
+
+  {
+    practices.map((p) => (
+      <section id={p.id} class="wrap practice-section">
+        <div class="practice-head">
+          <h2>{p.name}</h2>
+          <span>{p.span}</span>
+        </div>
+        <div class="grid offerings">
+          {p.offerings.map((o) => (
+            <article>
+              <h3>{o.title}</h3>
+              <p>{o.intro}</p>
+              <ul>
+                {o.items.map((i) => (
+                  <li>{i}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))
+  }
+
+  <section id="start" class="raised">
+    <div class="wrap section-96">
+      <p class="eyebrow">Ways to start</p>
+      <h2 class="h2 h2--sm start-heading">Three fixed-scope engagements, each led by a partner.</h2>
+      <div class="grid start-cards">
+        <div>
+          <p class="meta">2–3 weeks · pre-signing</p>
+          <h3>Transition diligence sprint</h3>
+          <p>Separation complexity, TSA scope, stranded cost and Day 1 risk, in a form the deal team can price.</p>
+        </div>
+        <div>
+          <p class="meta">2 weeks · post-close</p>
+          <h3>TSA health check</h3>
+          <p>Service coverage, exit readiness and CPS 230 treatment of each schedule, with a prioritised fix list.</p>
+        </div>
+        <div>
+          <p class="meta">3–4 weeks · in flight</p>
+          <h3>Programme assurance review</h3>
+          <p>An independent read on a programme in flight, reported to the sponsor.</p>
+        </div>
+      </div>
+      <p class="muted small sectors-line">
+        Sectors: banking · wealth and superannuation · life insurance · infrastructure and private markets · technology.
+      </p>
+    </div>
+  </section>
+
+  <CtaBand heading="Working on a deal or a transformation? Talk to a partner." label="services-cta-band" />
+</Base>

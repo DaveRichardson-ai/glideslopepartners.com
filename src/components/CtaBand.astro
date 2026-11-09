@@ -1,0 +1,14 @@
+---
+interface Props {
+  heading: string;
+  label: string;
+}
+const { heading, label } = Astro.props;
+---
+
+<section class="ink cta-band">
+  <div class="wrap">
+    <h2>{heading}</h2>
+    <a class="btn btn--primary" href="/contact/" data-track="cta" data-track-label={label}>Talk to a partner</a>
+  </div>
+</section>

@@ -1,0 +1,15 @@
+# Cloudflare Pages project. Deployed by GitHub Actions with `wrangler pages deploy`.
+name = "glideslope"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-11-01"
+
+# Count-only events (clicks, enquiries) for the weekly report.
+[[analytics_engine_datasets]]
+binding = "EVENTS"
+dataset = "glideslope_events"
+
+# Enquiry email goes through the glideslope-mailer Worker (workers/mailer),
+# because Pages Functions cannot hold a send_email binding themselves.
+[[services]]
+binding = "MAILER"
+service = "glideslope-mailer"

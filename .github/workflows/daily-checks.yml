@@ -1,0 +1,81 @@
+name: Daily checks
+
+# 02:00 AEST (16:00 UTC; 03:00 during daylight saving).
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+env:
+  SITE_URL: ${{ vars.PRODUCTION_URL || 'https://glideslope-d65.pages.dev' }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  live:
+    name: Live site check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Pages, redirects, internal links, headers, robots, sitemap, TLS
+        id: check
+        run: node scripts/ops/site-check.mjs "$SITE_URL" --tls
+      - name: Open an issue on failure
+        if: failure() && steps.check.outcome == 'failure'
+        run: |
+          node --input-type=module -e "
+            import { readFileSync } from 'node:fs';
+            import { openIssue } from './scripts/ops/lib.mjs';
+            const r = JSON.parse(readFileSync('site-check.json', 'utf8'));
+            await openIssue('Daily live check failed', 'The daily check of ' + r.base + ' found ' + r.problems.length + ' problem(s):\n\n' + r.problems.map((p) => '- ' + p).join('\n') + '\n\nRun: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}');
+          "
+
+  links:
+    name: External links and auto-fix
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Build both states
+        run: bash scripts/build-states.sh
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: lychee
+      - name: Check external links
+        continue-on-error: true
+        run: |
+          bash scripts/check-links.sh dist --format json --output lychee-1.json || true
+          bash scripts/check-links.sh dist-published --format json --output lychee-2.json || true
+          node -e "
+            const a = require('./lychee-1.json'), b = require('./lychee-2.json');
+            const m = { ...(a.error_map || {}), ...(b.error_map || {}) };
+            require('fs').writeFileSync('lychee.json', JSON.stringify({ error_map: m }));
+          "
+      - name: Fix dead links in the source
+        id: fix
+        run: node scripts/ops/dead-links.mjs lychee.json
+      - name: Open a pull request
+        if: steps.fix.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          # A token other than GITHUB_TOKEN lets CI run on this PR (see SETUP.md).
+          token: ${{ secrets.AUTOFIX_TOKEN || secrets.GITHUB_TOKEN }}
+          branch: auto-fix/dead-links
+          title: 'Fix dead external links'
+          body-path: dead-links-pr.md
+          labels: auto-fix
+          commit-message: 'Fix dead external links (archive or remove)'
+          add-paths: src/

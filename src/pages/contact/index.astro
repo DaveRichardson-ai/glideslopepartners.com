@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import { site } from '../../data/site';
+---
+
+<Base
+  title="Talk to a partner — Glideslope Partners"
+  description="A confidential conversation with a partner about your transaction or programme, with no obligation. A partner reads every message and replies personally."
+  turnstile="eager"
+  current="/contact/"
+>
+  <div class="ink contact-page">
+    <section class="wrap grid contact-grid contact-section">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h1 class="title">Talk to a partner.</h1>
+        <p class="lead lead--body">
+          A conversation is confidential and carries no obligation. If you are pre-announcement, say so and it stays with the
+          partners.
+        </p>
+        <h2 class="next-heading">What happens next</h2>
+        <ol class="next-steps">
+          <li>A partner reads your message and replies personally.</li>
+          <li>We arrange a call to understand the transaction or programme.</li>
+          <li>If we can help, we propose a fixed-scope first step.</li>
+        </ol>
+        <div class="contact-details">
+          <a href={`mailto:${site.email}`} data-track="mailto" data-track-label="contact-email">{site.email}</a>
+          <span>Sydney, New South Wales</span>
+          <a href={site.linkedin} rel="noopener" data-track="outbound" data-track-label="contact-linkedin-company">LinkedIn</a>
+        </div>
+      </div>
+      <ContactForm source="contact" load="eager" />
+    </section>
+  </div>
+</Base>

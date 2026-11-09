@@ -1,0 +1,6 @@
+[2m16:25:40[22m [34m[check][39m Getting diagnostics for Astro files in C:\Dev\Glideslope...
+Result (46 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+

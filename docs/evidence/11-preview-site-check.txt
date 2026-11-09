@@ -1,0 +1,7 @@
+### Site check: https://glideslope-d65.pages.dev
+
+Pages in sitemap: 5. Internal links checked: 18. Redirects checked: 5.
+
+TLS certificate: 89 days to expiry.
+
+**All checks passed.**

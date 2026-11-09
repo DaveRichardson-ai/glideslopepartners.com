@@ -1,0 +1,2 @@
+PASS  tests/fixtures/insights-bad-date: build failed with the expected message
+PASS  tests/fixtures/insights-bad-marker: build failed with the expected message

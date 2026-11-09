@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import Lights from '../components/Lights.astro';
+import { hasInsights } from '../lib/insights';
+const showInsights = await hasInsights();
+---
+
+<Base
+  title="Page not found — Glideslope Partners"
+  description="The page you were looking for has moved or does not exist."
+  noindex
+  ogImage="/og/home.png"
+>
+  <section class="ink lost">
+    <div class="wrap">
+      <Lights width={96} height={16} colours={['white', 'white', 'white', 'white']} label="Approach lights showing too high" />
+      <p class="eyebrow">404 · Page not found</p>
+      <h1 class="title">Four white lights. You are off the glideslope.</h1>
+      <p class="lead lead--body">The page you were looking for has moved or does not exist. These will get you back on approach:</p>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/services/">Services</a></li>
+        {showInsights && <li><a href="/insights/">Insights</a></li>}
+        <li><a href="/contact/" data-track="cta" data-track-label="404-talk-to-a-partner">Talk to a partner</a></li>
+      </ul>
+    </div>
+  </section>
+</Base>

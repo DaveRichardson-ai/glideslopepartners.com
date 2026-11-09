@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro';
+import Lights from '../../components/Lights.astro';
+import { site } from '../../data/site';
+---
+
+<Base
+  title="Message sent — Glideslope Partners"
+  description="Thank you for getting in touch. A partner will read your message and reply personally."
+  noindex
+>
+  <div class="ink contact-page">
+    <section class="wrap contact-section thanks">
+      <Lights width={96} height={16} colours={['white', 'white', 'amber', 'amber']} label="Approach lights showing on slope" />
+      <p class="eyebrow">Message sent</p>
+      <h1 class="title">Thank you. A partner will reply.</h1>
+      <p class="lead lead--body">
+        A partner reads every message and replies personally. If you need to add anything, email
+        <a href={`mailto:${site.email}`} data-track="mailto" data-track-label="thanks-email">{site.email}</a>.
+      </p>
+      <div class="actions">
+        <a class="btn btn--outline" href="/services/">See our services</a>
+        <a class="btn btn--outline" href="/">Back to the home page</a>
+      </div>
+    </section>
+  </div>
+</Base>

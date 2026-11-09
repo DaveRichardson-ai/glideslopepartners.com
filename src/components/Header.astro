@@ -1,0 +1,40 @@
+---
+interface Props {
+  showInsights: boolean;
+  current?: string | undefined;
+}
+const { showInsights, current } = Astro.props;
+const links = [
+  { href: '/services/', label: 'Services' },
+  { href: '/about/', label: 'About' },
+  ...(showInsights ? [{ href: '/insights/', label: 'Insights' }] : []),
+];
+---
+
+<header class="site-header">
+  <nav aria-label="Primary">
+    <a class="brand-link" href="/">
+      <img src="/brand/glideslope-wordmark-on-dark.svg" alt="Glideslope Partners home" width="150" height="27" />
+    </a>
+    <ul class="nav-links">
+      {
+        links.map((l) => (
+          <li>
+            <a href={l.href} aria-current={current === l.href ? 'page' : undefined}>
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a
+          class="btn btn--primary btn--sm"
+          href="/contact/"
+          data-track="cta"
+          data-track-label="nav-talk-to-a-partner"
+          aria-current={current === '/contact/' ? 'page' : undefined}>Talk to a partner</a
+        >
+      </li>
+    </ul>
+  </nav>
+</header>

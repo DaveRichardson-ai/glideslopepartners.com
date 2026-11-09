@@ -1,0 +1,80 @@
+---
+import { site } from '../data/site';
+interface Props {
+  source: 'home' | 'contact';
+  /** 'eager' loads the spam check at once; 'lazy' waits until someone starts filling in the form. */
+  load: 'eager' | 'lazy';
+  rows?: number;
+  submitLabel?: string;
+}
+const { source, load, rows = 6, submitLabel = 'Send message' } = Astro.props;
+const p = `${source}-`;
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
+---
+
+<form
+  class="form"
+  method="post"
+  action="/api/contact"
+  aria-label="Contact form"
+  data-contact-form
+  data-turnstile={load}
+>
+  {
+    source === 'contact' && (
+      <div id="form-errors" class="error-summary" role="alert" tabindex="-1" hidden>
+        <h2>We could not send your message</h2>
+        <p id="form-errors-text">Please check the form and try again.</p>
+      </div>
+    )
+  }
+  <input type="hidden" name="source" value={source} />
+  <input type="hidden" name="t" value="" data-started />
+  <div class="honeypot" aria-hidden="true">
+    <label for={`${p}website`}>Leave this field empty</label>
+    <input type="text" id={`${p}website`} name="website" tabindex="-1" autocomplete="off" />
+  </div>
+  <div class="pair">
+    <div class="field">
+      <label for={`${p}name`}>Name</label>
+      <input type="text" id={`${p}name`} name="name" autocomplete="name" required maxlength="120" />
+    </div>
+    <div class="field">
+      <label for={`${p}organisation`}>Organisation</label>
+      <input type="text" id={`${p}organisation`} name="organisation" autocomplete="organization" maxlength="160" />
+    </div>
+  </div>
+  <div class="field">
+    <label for={`${p}email`}>Work email</label>
+    <input type="email" id={`${p}email`} name="email" autocomplete="email" required maxlength="254" />
+  </div>
+  <div class="field">
+    <label for={`${p}stage`}>Where is the transaction?</label>
+    <select id={`${p}stage`} name="stage">
+      <option>Pre-signing</option>
+      <option>Signed, pre-completion</option>
+      <option>Post-completion</option>
+      <option>Not deal-related</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for={`${p}message`}>What are you working on?</label>
+    <textarea
+      id={`${p}message`}
+      name="message"
+      rows={rows}
+      required
+      minlength="20"
+      maxlength="5000"
+      aria-describedby={`${p}message-hint`}></textarea>
+    <span class="hint" id={`${p}message-hint`}>At least 20 characters.</span>
+  </div>
+  <div class="turnstile" data-turnstile-slot data-sitekey={siteKey}></div>
+  <noscript>
+    <p class="note">
+      The spam check needs JavaScript. If it is turned off, email us at <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+  </noscript>
+  <p class="note">We use your details only to reply. See our <a href="/privacy/">privacy policy</a>.</p>
+  <button class="btn btn--primary" type="submit">{submitLabel}</button>
+</form>

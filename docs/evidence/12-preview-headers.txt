@@ -1,0 +1,41 @@
+$ curl -sI https://glideslope-d65.pages.dev/
+HTTP/1.1 200 OK
+Cache-Control: public, max-age=0, must-revalidate
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+content-security-policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://challenges.cloudflare.com; connect-src 'self' https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; img-src 'self' data:; style-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests
+cross-origin-opener-policy: same-origin
+permissions-policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+referrer-policy: strict-origin-when-cross-origin
+x-content-type-options: nosniff
+x-frame-options: DENY
+$ curl -sI https://glideslope-d65.pages.dev/what-we-do
+HTTP/1.1 301 Moved Permanently
+Location: /services/
+$ curl -sI https://glideslope-d65.pages.dev/who-we-are
+HTTP/1.1 301 Moved Permanently
+Location: /about/
+$ curl -sI https://glideslope-d65.pages.dev/get-in-touch
+HTTP/1.1 301 Moved Permanently
+Location: /contact/
+$ curl -sI https://glideslope-d65.pages.dev/privacy_policy
+HTTP/1.1 301 Moved Permanently
+Location: /privacy/
+$ curl -sI https://glideslope-d65.pages.dev/index.html
+HTTP/1.1 301 Moved Permanently
+Location: /
+$ curl -sI https://glideslope-d65.pages.dev/about
+HTTP/1.1 308 Permanent Redirect
+Location: /about/
+$ curl -sI https://glideslope-d65.pages.dev/nope/
+HTTP/1.1 404 Not Found
+$ curl -s -D - -o /dev/null -H 'Range: bytes=0-1' https://glideslope-d65.pages.dev/media/glideslope-brand-sting-v1.mp4
+HTTP/1.1 206 Partial Content
+Content-Range: bytes 0-1/114312
+Accept-Ranges: bytes
+Cache-Control: public, max-age=31536000, immutable
+X-Frame-Options: DENY
+$ curl -s -D - -o /dev/null -X POST -d name= https://glideslope-d65.pages.dev/api/contact
+HTTP/1.1 303 See Other
+Location: https://glideslope-d65.pages.dev/contact/?error=spam-check#form-errors
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+X-Frame-Options: DENY

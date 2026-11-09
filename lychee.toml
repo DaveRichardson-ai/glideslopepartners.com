@@ -1,0 +1,19 @@
+# lychee link checker. Internal links resolve against the built site (--root-dir).
+include_fragments = "full"
+# mailto: links are checked by scripts/check-mailto.mjs (address syntax + MX record);
+# lychee's SMTP probe is refused by Microsoft 365 and port 25 is blocked on CI runners.
+include_mail = false
+index_files = ["index.html"]
+max_retries = 3
+timeout = 30
+# LinkedIn answers automated checks with 999; some publishers with 403 or 429.
+accept = ["200..=299", "403", "429", "999"]
+exclude = [
+  '^https://challenges\.cloudflare\.com',
+  '^https://static\.cloudflareinsights\.com',
+  # The contact form's POST endpoint, not a page.
+  '/api/contact$',
+  # Social images are generated at build time; the absolute URLs only resolve once live.
+  '^https://glideslopepartners\.com/og/',
+]
+user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"

@@ -1,0 +1,58 @@
+name: Uptime
+
+# Hourly: / and /contact/ return 200 with the expected text in under 1 second.
+# Two failures in a row open an issue and email the owner.
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SITE_URL: ${{ vars.PRODUCTION_URL || 'https://glideslope-d65.pages.dev' }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      REPORT_RECIPIENTS: ${{ secrets.REPORT_RECIPIENTS }}
+      ALERT_RECIPIENTS: ${{ secrets.ALERT_RECIPIENTS }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/ops
+            package.json
+            package-lock.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install the mail library only
+        run: npm install --no-save --ignore-scripts nodemailer@10
+      - name: Previous result
+        uses: dawidd6/action-download-artifact@v6
+        continue-on-error: true
+        with:
+          workflow: uptime.yml
+          name: uptime-state
+          path: previous
+          workflow_conclusion: ''
+          if_no_artifact_found: warn
+      - name: Check
+        run: node scripts/ops/uptime.mjs previous/uptime.json
+      - name: Keep this result for the next run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uptime-state
+          path: uptime.json
+          retention-days: 3
+          overwrite: true
