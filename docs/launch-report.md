@@ -2,7 +2,7 @@
 
 Built and verified on 9 November 2026.
 
-**Preview:** <https://glideslope-d65.pages.dev> (Cloudflare Pages project `glideslope`). The live domain still serves the Figma site. The cut-over is SETUP.md step 15, after the owner approves the preview.
+**Live:** <https://glideslopepartners.com>, cut over from Figma Sites on 9 November 2026. It is served by the Cloudflare Pages project `glideslope` (<https://glideslope-d65.pages.dev>) and deployed from <https://github.com/DaveRichardson-ai/glideslopepartners.com> through CI.
 
 Every result below comes from a command run on this date. The raw output is in [`docs/evidence/`](evidence/).
 
@@ -116,25 +116,31 @@ The cross-browser tests found three real problems, all fixed:
 11. **The 404 page logs one console message.** A browser always logs "Failed to load resource: 404" for a page served with status 404, which the brief requires. The console test allows that one message on that one page only. Lighthouse cannot audit a 404 response at all, so the 404 page is covered by axe, pa11y, html-validate and Playwright instead.
 12. **INP in the lab is measured as Total Blocking Time** (0 ms on every page). INP needs real interactions. The weekly report shows the real-visitor p75 INP from Cloudflare.
 13. **Firefox and WebKit ran in Docker on this PC.** Something on this machine, probably antivirus, deletes their executables after install. They ran in Microsoft's official Playwright image instead, and CI runs them natively on Linux.
+15. **Bot Fight Mode is off.** On the free plan it challenges every automated visitor and cannot exempt our own uptime, daily and Lighthouse checks. Turnstile, the rate limit, the honeypot and the minimum fill time protect the form.
+16. **Rate limit matches the path only.** The free plan's rule builder does not offer Request Method. Only the form posts to `/api/contact`, so the path alone is enough.
+17. **Weekly report and alerts arrive as GitHub notifications**, not email from a separate sender. The owner preferred not to create a Gmail account. Every report and alert is an issue assigned to the owner, and GitHub emails it. Direct SMTP delivery remains available (SETUP.md step 12).
+18. **Web Analytics loads on the production domain only.** Cloudflare rejects the beacon from preview addresses, with console errors, so the tracking script adds it only on `glideslopepartners.com`.
+19. **Lighthouse in CI takes the median of 5 runs per page.** GitHub's shared runners vary: one run measured the Privacy page's LCP at 1.61 s, against 0.78 s locally. The 1.5 s budget is unchanged.
+20. **The live preview test ignores Turnstile's own console messages** on the two pages that load it. The real widget logs errors from inside its iframe while working normally; we cannot change that code. Errors from our own pages still fail.
 14. **Melbourne and Brisbane** were added only to the home eyebrow and its share image. The footer, contact details and the structured-data address still say Sydney, New South Wales, because they describe where the business is based. Say if you want offices listed there too.
 
 ## Needs the owner
 
-In order. Full click-by-click steps are in [SETUP.md](../SETUP.md).
+Done on 9 November 2026: shared hello@ mailbox; public GitHub repository; Cloudflare API token; Turnstile; Web Analytics; enquiry email (tested end to end: the form delivered to hello@); DKIM and DMARC; Search Console service account and sitemap submission; Bing import; rate limit; cut-over, `www` redirect and Always Use HTTPS. Still open:
 
-1. **Approve the preview** at <https://glideslope-d65.pages.dev>. Until steps 4–6 are done, it runs on Cloudflare's always-pass Turnstile test key, and the contact form answers "not taking messages yet".
-2. **Shared mailbox:** make `hello@glideslopepartners.com` a free Microsoft 365 shared mailbox for both partners (SETUP.md step 0), then finish the GitHub settings (step 1). The public repository is at <https://github.com/DaveRichardson-ai/glideslopepartners.com>.
-3. **Secrets:** Cloudflare API token and account ID, Turnstile keys, Web Analytics site tag, Search Console service account, SMTP for the weekly report.
-4. **Email Sending on `notify.glideslopepartners.com`** and the verified destination address (step 6). Do **not** onboard the root domain to Email Routing.
-5. **DKIM and DMARC.** Checked today: DKIM is not turned on for Microsoft 365, and there is no DMARC record (step 9).
-6. **Privacy policy check.** It says email is handled by Google, but the domain's mail runs on **Microsoft 365**. That is a statement about your business, so I have not changed it. Change "Google (email)" to "Microsoft (email)" if Microsoft 365 is your only email provider.
-7. **Confirm the three engagement durations** (2–3 weeks, 2 weeks, 3–4 weeks) still hold.
-8. **Partner review of the three insights.** Each still contains `[verify …]` or `[check …]` notes; the build will not publish an article until they are resolved.
-9. **Cut-over** (step 15), then HSTS preload after four clean weeks.
+1. **GitHub ruleset for `main` and the `production` environment** (SETUP.md step 1).
+2. **Search Console:** URL inspection → `https://glideslopepartners.com/` → **Request indexing** (the API cannot do this).
+3. **Remove DNS Edit** from the Cloudflare API token now the cut-over is done (step 15).
+4. **Privacy policy check.** It says email is handled by Google, but the domain's mail runs on **Microsoft 365**. That is a statement about your business, so I have not changed it.
+5. **Confirm the three engagement durations** (2–3 weeks, 2 weeks, 3–4 weeks) still hold.
+6. **Partner review of the three insights.** Each still contains `[verify …]` or `[check …]` notes; the build will not publish an article until they are resolved.
+7. **Dependabot pull request #1** (GitHub Actions versions, including major updates) needs a look; it removes the "Node.js 20 is deprecated" notices.
+8. **Dated reminders:** DMARC `p=none` → `p=quarantine` from 7 December 2026; HSTS preload submission from 7 December 2026; delete the Figma Sites project after 9 December 2026.
+9. **Optional:** invite Phil to the repository so he gets the weekly report (step 12); the remaining step 8 settings (SSL Full (strict), minimum TLS 1.2, DNSSEC).
 
 ## What is deployed now
 
-- Cloudflare Pages project `glideslope`, production branch `main`, at <https://glideslope-d65.pages.dev>. Not yet attached to any custom domain.
-- Worker `glideslope-mailer`, with no public URL. It is reachable only from the Pages project and sends nothing until `CONTACT_DESTINATION` is set.
-- Public GitHub repository <https://github.com/DaveRichardson-ai/glideslopepartners.com>, with no secrets set yet, so the deploy jobs skip with a warning.
-- Nothing has changed in DNS, Email Routing, Turnstile or Web Analytics.
+- `glideslopepartners.com` → Cloudflare Pages project `glideslope`. `www`, `http://` and the old Figma URLs all 301 to the right `https://glideslopepartners.com/` page. Verified live: site check (pages, internal links, redirects, headers, certificate) and 14 browser tests on the real domain, all passing.
+- Worker `glideslope-mailer` (no public URL), sending from `website@notify.glideslopepartners.com` to the verified hello@ shared mailbox.
+- Email: SPF (Microsoft 365), DKIM signing on, DMARC `p=none` reporting to hello@. Cloudflare Email Sending records only under `notify.`.
+- Scheduled jobs pointed at the real domain: hourly uptime, daily checks, the Monday report (first test report: issue #6), and sitemap submission (submitted 9 November 2026).

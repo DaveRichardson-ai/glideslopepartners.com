@@ -8,6 +8,10 @@ Until a secret exists, the job that needs it skips with a warning and CI stays g
 
 ---
 
+## Status on 9 November 2026
+
+Steps 0–7, 9–11 and 15 are done, and the site is live on `glideslopepartners.com`. Still open: the GitHub ruleset in step 1, most of step 8, and the dated reminders (DMARC in step 9, HSTS preload in step 8, Figma clean-up in step 15). The steps below are kept as a record and for rebuilding from scratch.
+
 ## Decisions already made
 
 1. **Repository:** public, at <https://github.com/DaveRichardson-ai/glideslopepartners.com>. GitHub Actions minutes are unlimited for public repositories, and nothing secret lives in the code.
@@ -136,14 +140,20 @@ Deploys come from GitHub Actions with `wrangler pages deploy`, not from Cloudfla
 
 ## 5. Web Analytics (visits, pages, Core Web Vitals; no cookies)
 
-1. Dashboard → **Workers & Pages → glideslope → Metrics → Web Analytics → Enable**. Cloudflare then adds its beacon to every page automatically. The beacon is an external script, which the site's Content Security Policy already allows.
-2. Dashboard → **Analytics & Logs → Web Analytics**. Open the site and choose **Manage site**. Copy the **site tag**:
+The site adds the Cloudflare beacon itself, on `glideslopepartners.com` only (Cloudflare rejects it on preview addresses). So the dashboard's automatic injection must stay **off**, or every visit is counted twice.
+
+1. Dashboard → **Observability → Analytics → Web analytics** → **Add a site** (or the existing `glideslopepartners.com` site → **Manage site**). Choose **Enable with JS Snippet installation** → **Update**.
+2. From the snippet, copy the **token** value (32 letters and numbers). Pasting the whole snippet also works; the build extracts the token.
+
+   ```bash
+   gh secret set CF_WEB_ANALYTICS_SITE_TOKEN
+   ```
+
+3. Open the site's charts. The address bar contains `siteTag~in=` followed by the **site tag**, which the weekly report uses.
 
    ```bash
    gh secret set CF_WEB_ANALYTICS_SITE_TAG
    ```
-
-   Alternative to step 1: add the site manually, copy the snippet's `token` value, and run `gh secret set CF_WEB_ANALYTICS_SITE_TOKEN`. The build then adds the beacon itself. Use one method, not both.
 
 ## 6. Enquiry email (Email Sending on a subdomain)
 
@@ -167,8 +177,8 @@ Deploys come from GitHub Actions with `wrangler pages deploy`, not from Cloudfla
 
 The Free plan allows one rate-limiting rule with a **10-second** window only, so the brief's "5 per 10 minutes" is not available. The closest setting:
 
-1. Dashboard → `glideslopepartners.com` → **Security → WAF → Rate limiting rules → Create rule**.
-2. Name: `contact form`. **If incoming requests match:** URI Path equals `/api/contact` AND Request Method equals `POST`.
+1. Dashboard → `glideslopepartners.com` → **Security → Security rules** (older screens: WAF) → **Create rule → Rate limiting rule**.
+2. Name: `contact form`. **If incoming requests match:** URI Path equals `/api/contact`. The free plan does not offer Request Method here, and it is not needed: only the form posts to that address.
 3. **With the same characteristics:** IP. **When rate exceeds:** 5 requests per 10 seconds. **Then:** Block for 10 seconds. **Deploy.**
 
 Turnstile, the hidden honeypot field and the three-second minimum fill time do the rest.
@@ -180,36 +190,39 @@ On `glideslopepartners.com`:
 1. **SSL/TLS → Overview:** Full (strict).
 2. **SSL/TLS → Edge Certificates:** Always Use HTTPS **on**; Minimum TLS Version **1.2**; TLS 1.3 **on**; Automatic HTTPS Rewrites **on**. Leave HSTS off here: the site sends its own HSTS header.
 3. **DNS → Settings:** DNSSEC → **Enable**. Cloudflare Registrar adds the DS record for you.
-4. **Security → Bots:** Bot Fight Mode **on**.
-5. **After four clean weeks live:** submit the domain at <https://hstspreload.org>. The header is already preload-ready. This is hard to undo, so wait until you are sure every subdomain serves HTTPS.
+4. **Bot Fight Mode: leave off.** On the free plan it challenges every automated visitor and cannot exempt our own uptime, daily and Lighthouse checks from GitHub. Turnstile and the rate limit protect the form.
+5. **Email Address Obfuscation** (Security → Settings, or Scrape Shield): **off**. When on, Cloudflare rewrites every `mailto:` link into a `/cdn-cgi/l/email-protection` link that fails without JavaScript. Turned off on 9 November 2026.
+6. **After four clean weeks live (from 7 December 2026):** submit the domain at <https://hstspreload.org>. The header is already preload-ready. This is hard to undo, so wait until you are sure every subdomain serves HTTPS.
 
 ## 9. Email authentication (SPF, DKIM, DMARC)
 
-Checked on 9 November 2026: SPF is correct for Microsoft 365; **DKIM is not turned on; there is no DMARC record.**
+Done on 9 November 2026: SPF (already correct for Microsoft 365), DKIM signing on, DMARC `p=none`.
 
-1. **DKIM.** Microsoft Defender portal → **Email & collaboration → Policies & rules → Threat policies → Email authentication settings → DKIM** → select `glideslopepartners.com`. It shows two CNAME records (`selector1._domainkey` and `selector2._domainkey`). Add both in Cloudflare DNS with **proxy off**, then switch **Sign messages for this domain with DKIM signatures** on.
+1. **DKIM.** <https://security.microsoft.com/dkimv2> → select `glideslopepartners.com` → **Create DKIM keys**. It shows two CNAME records (`selector1._domainkey` and `selector2._domainkey`, pointing to `…glideslopepartners.e-v1.dkim.mail.microsoft`). Add both in Cloudflare DNS with **proxy off** (DNS only). Wait 15–60 minutes, then switch **Sign messages for this domain with DKIM signatures** on. A "CNAME record does not exist" error only means Microsoft has not seen the records yet.
 2. **DMARC.** Cloudflare DNS → **Add record**: Type `TXT`, Name `_dmarc`, Content:
 
    ```
    v=DMARC1; p=none; rua=mailto:hello@glideslopepartners.com; adkim=r; aspf=r
    ```
 
-3. After four weeks of clean reports (only Microsoft 365 and Cloudflare passing), change `p=none` to `p=quarantine`. The weekly report reminds you. Set the launch date so it can count:
-
-   ```bash
-   gh variable set LAUNCH_DATE --body 2026-11-16
-   ```
+3. After four weeks of clean reports (only Microsoft 365 and Cloudflare passing), change `p=none` to `p=quarantine`, from **7 December 2026**. The weekly report reminds you; it counts from the `LAUNCH_DATE` variable (2026-11-09).
 
 ## 10. Google Search Console (reports and sitemap submission)
 
-1. <https://console.cloud.google.com> → create a project named `glideslope-reporting` → **APIs & Services → Library** → enable **Google Search Console API**.
+1. <https://console.cloud.google.com> → project picker (top left) → **New project** → `glideslope-reporting`. New projects appear under the picker's **All** tab, not Recent. Then **APIs & Services → Library** → enable **Google Search Console API** in *that* project. A 403 "API has not been used in project …" means it was enabled somewhere else.
 2. **IAM & Admin → Service accounts → Create service account** named `search-console-reader`. No roles. Open it → **Keys → Add key → JSON**. A file downloads.
 3. Search Console → the `glideslopepartners.com` property → **Settings → Users and permissions → Add user**: the service account's email address, permission **Full** (needed to submit sitemaps).
 4. Store the key, then delete the downloaded file:
 
-   ```bash
-   gh secret set GSC_SERVICE_ACCOUNT_JSON < path/to/downloaded-key.json
+   In PowerShell:
+
+   ```powershell
+   Get-Content -Raw "C:/Users/<you>/Downloads/<key-file>.json" | gh secret set GSC_SERVICE_ACCOUNT_JSON
    ```
+
+   In Git Bash or macOS: `gh secret set GSC_SERVICE_ACCOUNT_JSON < path/to/key.json`
+
+   To test it: **Actions → Submit sitemap → Run workflow**.
 
    If your property is a URL-prefix property rather than a domain property, also run `gh variable set GSC_PROPERTY --body https://glideslopepartners.com/`.
 
@@ -217,9 +230,16 @@ Checked on 9 November 2026: SPF is correct for Microsoft 365; **DKIM is not turn
 
 <https://www.bing.com/webmasters> → sign in → **Import from Google Search Console** → choose the property. Bing then reads the same sitemap. Nothing to configure in this repository.
 
-## 12. Weekly report email
+## 12. Weekly report and alerts by email
 
-The report goes to Dave and Phil. The simplest sender is a dedicated Gmail account with an app password (Google limits personal accounts to about 500 messages a day; we send one a week, plus rare alerts).
+**Default, with no extra account: GitHub notifications.** Every report and alert is a GitHub issue assigned to the repository owner, and GitHub emails the owner about it.
+
+1. <https://github.com/settings/notifications> → **Email** → choose the address reports should go to.
+2. To include Phil: <https://github.com/DaveRichardson-ai/glideslopepartners.com/settings/access> → **Add people** (he needs a free GitHub account). On the repository page he clicks **Watch → Custom → Issues**.
+
+The SMTP secrets below stay unset, and the jobs skip their own email with a warning.
+
+**Optional: direct email from the jobs**, only if you want the report as a plain email rather than a GitHub notification. A dedicated Gmail account with an app password works (Google limits personal accounts to about 500 messages a day):
 
 1. Create a Gmail account, for example `glideslope.reports@gmail.com`. Turn on 2-Step Verification, then <https://myaccount.google.com/apppasswords> → create an app password named `github`.
 2. Set the secrets:
@@ -244,23 +264,23 @@ Skip this if the repository is public. Otherwise: <https://uptimerobot.com> → 
 
 Pull requests opened with GitHub's built-in token do not trigger other workflows, so CI will not start on an auto-fix pull request until someone closes and reopens it. To avoid that, create a fine-grained token (GitHub → Settings → Developer settings → Fine-grained tokens) for this repository only, with **Contents: Read and write** and **Pull requests: Read and write**, then run `gh secret set AUTOFIX_TOKEN`.
 
-## 15. Approve the preview, then cut over from Figma Sites
+## 15. Cut over from Figma Sites (done 9 November 2026)
 
-1. Open the preview URL from the launch report on a phone and a computer. Check every page, the contact form and the brand video.
-2. Tell Claude (or run the steps yourself) when it is approved.
-3. Dashboard → **Workers & Pages → glideslope → Custom domains → Set up a domain** → `glideslopepartners.com`. Cloudflare offers to replace the existing `A 204.69.207.1` (Figma) record. Accept.
-4. Repeat for `www.glideslopepartners.com`. It replaces the `www` CNAME to `sites.figma.net`.
-5. Redirect `www` to the root domain: **Rules → Redirect Rules → Create rule** → name `www to apex` → **Custom filter**: Hostname equals `www.glideslopepartners.com` → **Then:** Dynamic, expression `concat("https://glideslopepartners.com", http.request.uri.path)`, status **301**, **Preserve query string** on. Deploy.
+1. Approve the preview on a phone and a computer.
+2. **Workers & Pages → glideslope → Custom domains → Set up a custom domain** → `glideslopepartners.com`. Cloudflare replaces `A 204.69.207.1` (Figma) with a CNAME to `glideslope-d65.pages.dev`; MX, SPF, DKIM and DMARC records are untouched. **Activate domain.**
+3. **DNS → Records → `www`** (was a CNAME to `sites.figma.net`) → target `glideslopepartners.com`, proxy **on**.
+4. **Rules → Redirect Rules → Create rule** → `www to apex` → **Wildcard pattern**. Request URL `http*://www.glideslopepartners.com/*` (covers http and https), Target URL `https://glideslopepartners.com/${2}`, **301**, **Preserve query string** on. If Cloudflare warns that the rule "may not apply to your traffic", choose **Ignore and deploy rule anyway**: the warning misreads `http*`.
+5. **SSL/TLS → Edge Certificates → Always Use HTTPS: on.**
 6. Set the production URL so the scheduled jobs check the real domain:
 
    ```bash
    gh variable set PRODUCTION_URL --body https://glideslopepartners.com
    ```
 
-7. Run **Actions → Daily checks → Run workflow**. It checks every page, the redirects, headers and the certificate on the live domain.
-8. Search Console → **Sitemaps** → submit `https://glideslopepartners.com/sitemap.xml` (CI also does this on every deploy that changes it). Then **URL inspection** → `https://glideslopepartners.com/` → **Request indexing**.
-9. Remove **DNS Edit** from the Cloudflare API token (step 2).
-10. Keep the Figma Sites project for 30 days, then delete it.
+7. Run **Actions → Daily checks → Run workflow** to check every page, the redirects, headers and the certificate on the live domain.
+8. **Actions → Submit sitemap → Run workflow** (deploys also resubmit it when the pages change). Then in Search Console: **URL inspection** → `https://glideslopepartners.com/` → **Request indexing**. The API cannot do this step.
+9. Remove **DNS Edit** from the Cloudflare API token (step 2); nothing automated needs it any more.
+10. Keep the Figma Sites project until **9 December 2026**, then delete it.
 
 ## 16. Optional: a weekly Claude task that acts on the report
 
