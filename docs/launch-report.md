@@ -123,7 +123,7 @@ The cross-browser tests found three real problems, all fixed:
 In order. Full click-by-click steps are in [SETUP.md](../SETUP.md).
 
 1. **Approve the preview** at <https://glideslope-d65.pages.dev>. Until steps 4–6 are done, it runs on Cloudflare's always-pass Turnstile test key, and the contact form answers "not taking messages yet".
-2. **GitHub repository:** choose public (recommended) or private. It has not been created yet.
+2. **Shared mailbox:** make `hello@glideslopepartners.com` a free Microsoft 365 shared mailbox for both partners (SETUP.md step 0), then finish the GitHub settings (step 1). The public repository is at <https://github.com/DaveRichardson-ai/glideslopepartners.com>.
 3. **Secrets:** Cloudflare API token and account ID, Turnstile keys, Web Analytics site tag, Search Console service account, SMTP for the weekly report.
 4. **Email Routing on `notify.glideslopepartners.com`** and the verified destination address (step 6). Do **not** enable it on the root domain.
 5. **DKIM and DMARC.** Checked today: DKIM is not turned on for Microsoft 365, and there is no DMARC record (step 9).
@@ -136,4 +136,5 @@ In order. Full click-by-click steps are in [SETUP.md](../SETUP.md).
 
 - Cloudflare Pages project `glideslope`, production branch `main`, at <https://glideslope-d65.pages.dev>. Not yet attached to any custom domain.
 - Worker `glideslope-mailer`, with no public URL. It is reachable only from the Pages project and sends nothing until `CONTACT_DESTINATION` is set.
-- Nothing has changed in DNS, Email Routing, Turnstile, Web Analytics or GitHub.
+- Public GitHub repository <https://github.com/DaveRichardson-ai/glideslopepartners.com>, with no secrets set yet, so the deploy jobs skip with a warning.
+- Nothing has changed in DNS, Email Routing, Turnstile or Web Analytics.

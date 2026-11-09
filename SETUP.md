@@ -8,31 +8,57 @@ Until a secret exists, the job that needs it skips with a warning and CI stays g
 
 ---
 
-## Before you start: two decisions
+## Decisions already made
 
-1. **Public or private repository?** Public is recommended: GitHub Actions minutes are unlimited, and nothing secret lives in the code. Private repositories get US$12 of Actions compute a month (about 2,000 Linux minutes). With a private repository, the hourly uptime job alone uses about 750 minutes a month. In that case, delete `.github/workflows/uptime.yml` and use UptimeRobot's free plan instead (step 13).
-2. **Email for enquiries.** The site sends each enquiry to one verified address, normally `hello@glideslopepartners.com`.
+1. **Repository:** public, at <https://github.com/DaveRichardson-ai/glideslopepartners.com>. GitHub Actions minutes are unlimited for public repositories, and nothing secret lives in the code.
+2. **Enquiries go to `hello@glideslopepartners.com`**, set up as a free shared mailbox that Dave and Phil both see (step 0).
+
+---
+
+## 0. Make hello@ a shared mailbox (Microsoft 365, free)
+
+The domain's email runs on Microsoft 365. A **shared mailbox** costs nothing: it needs no licence and no password, holds up to 50 GB, and appears automatically in the Outlook of everyone you give access to. Both partners see the same inbox, can reply as `hello@`, and can see what the other has answered.
+
+### First, check what hello@ is today
+
+1. Go to <https://admin.microsoft.com> and sign in as a Microsoft 365 admin.
+2. In the search box at the top, type `hello@glideslopepartners.com`.
+   - **Nothing found:** go to "Create the shared mailbox" below.
+   - **It is a user** (it has its own licence and password): you can convert it instead. **Users → Active users →** select it → **Mail** tab → **Convert to shared mailbox → Convert**. Its existing mail is kept. Then, under **Licences and apps**, untick the licence and **Save** so you stop paying for it. Skip to "Give both partners access".
+   - **It is an alias on someone's mailbox** (it shows under a person's **Username and email → Aliases**): remove the alias first (**Users → Active users →** that person → **Manage username and email** → delete `hello@` → **Save changes**). Wait 15 minutes, then create the shared mailbox below.
+   - **It is a distribution list or Microsoft 365 group:** delete or rename it under **Teams & groups**, then create the shared mailbox.
+
+### Create the shared mailbox
+
+1. Admin centre → **Teams & groups → Shared mailboxes → Add a shared mailbox**.
+2. **Name:** `Glideslope Partners`. This is the name people see when you reply. **Email:** `hello`, domain `glideslopepartners.com`. **Save changes**.
+
+### Give both partners access
+
+1. On the confirmation page, choose **Add members to this mailbox** (or later: **Shared mailboxes →** `Glideslope Partners` **→ Members → Edit**).
+2. **Add members:** Dave and Phil. **Save**. This gives each of them **Read and manage** and **Send as**.
+3. Optional, so replies show who answered: **Shared mailboxes →** `Glideslope Partners` → **Sent items** → tick **Copy items sent as this mailbox** so sent replies are visible to both partners, not just the sender.
+
+### Use it
+
+- **Outlook on the web or desktop:** the mailbox appears in each partner's folder list within an hour, with no sign-in. To reply as hello@, open the message and reply. To start a new email from it, click **From** (turn it on under **Options → Show From**) and choose `hello@glideslopepartners.com`.
+- **iPhone (Outlook app):** **Settings → Add shared mailbox →** `hello@glideslopepartners.com`. The built-in iPhone Mail app does not support shared mailboxes; use the Outlook app.
+
+### Things a shared mailbox cannot do
+
+- **No password, so no direct sign-in.** That is why the weekly report is sent from a separate free Gmail account (step 12) rather than from hello@.
+- **It can still receive verification emails.** Cloudflare's "verify destination address" email (step 6) and the DMARC reports (step 9) arrive in the shared inbox like any other mail. Either partner can click the link.
 
 ---
 
 ## 1. GitHub repository
 
-If Claude has not already created it:
+Created and pushed. Remaining settings:
 
-1. Go to <https://github.com/new>. Name: `glideslopepartners.com`. Visibility: as decided above. Do not add a README.
-2. In this folder, run:
-
-   ```bash
-   git remote add origin https://github.com/<your-account>/glideslopepartners.com.git
-   ```
-
-   ```bash
-   git push -u origin main
-   ```
-
-3. **Settings → General → Pull Requests:** tick **Allow auto-merge**. Dependabot updates need this.
-4. **Settings → Branches → Add branch ruleset** for `main`. Tick **Require a pull request before merging** and **Require status checks to pass**, then add the check **Build and verify**. This is what stops a failing change reaching production.
-5. **Settings → Environments → New environment** named `production`. It can stay empty. Add yourself as a required reviewer only if you want to approve each deploy by hand.
+1. Open <https://github.com/DaveRichardson-ai/glideslopepartners.com/settings>.
+2. **Settings → General → Pull Requests:** tick **Allow auto-merge**. Dependabot updates need this.
+3. **Settings → Branches → Add branch ruleset** for `main`. Tick **Require a pull request before merging** and **Require status checks to pass**, then add the check **Build and verify**. This is what stops a failing change reaching production.
+4. **Settings → Environments → New environment** named `production`. It can stay empty. Add yourself as a required reviewer only if you want to approve each deploy by hand.
 
 ## 2. Cloudflare API token
 
@@ -103,7 +129,7 @@ Deploys come from GitHub Actions with `wrangler pages deploy`, not from Cloudfla
 **Important:** the domain's email runs on Microsoft 365. Turning on Email Routing for `glideslopepartners.com` itself would replace its MX records and stop your email. So Email Routing goes on a subdomain, `notify.glideslopepartners.com`, which only sends.
 
 1. Dashboard → `glideslopepartners.com` → **Email → Email Routing → Get started**. When it asks for the domain, choose **Add subdomain** and enter `notify`. Let Cloudflare add the records it lists; they are all on `notify.` and leave the root domain alone. Check afterwards that the root domain's MX record still points to `glideslopepartners-com.mail.protection.outlook.com`.
-2. **Email Routing → Destination addresses → Add destination address:** `hello@glideslopepartners.com` (or wherever enquiries should land). Click the link in the verification email.
+2. **Email Routing → Destination addresses → Add destination address:** `hello@glideslopepartners.com`. The verification email lands in the shared mailbox (step 0); either partner clicks the link.
 3. Store the destination as a secret on the mailer Worker:
 
    ```bash
@@ -187,7 +213,7 @@ The report goes to Dave and Phil. The simplest sender is a dedicated Gmail accou
 
    `REPORT_RECIPIENTS` is a comma-separated list, for example Dave's and Phil's addresses. Optional: `ALERT_RECIPIENTS` for uptime alerts, if they should go somewhere different.
 
-   Microsoft 365 alternative: `smtp.office365.com`, port `587`, a licensed mailbox with SMTP AUTH enabled for it.
+   Microsoft 365 alternative: `smtp.office365.com`, port `587`, with a *licensed* mailbox that has SMTP AUTH turned on. The shared hello@ mailbox cannot do this, because it has no password.
 
 ## 13. Uptime alternative (private repository only)
 
