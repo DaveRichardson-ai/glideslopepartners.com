@@ -78,6 +78,7 @@ PW_REMOTE=ws://127.0.0.1:3000/ npx playwright test
    author: philip-hyde     # or david-richardson
    publishDate: 2026-12-01
    draft: false
+   featured: true          # optional: pins it to the top of Insights
    ---
    ```
 

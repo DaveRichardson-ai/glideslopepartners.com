@@ -6,6 +6,7 @@ topic: wealth
 author: david-richardson
 publishDate: 2026-11-10
 draft: false
+featured: true          # pinned to the top of Insights
 ---
 
 ## Wealth is back on the bank agenda

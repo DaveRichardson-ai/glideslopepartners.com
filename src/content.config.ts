@@ -17,6 +17,8 @@ const insights = defineCollection({
       publishDate: z.coerce.date().nullable(),
       updatedDate: z.coerce.date().optional(),
       draft: z.boolean(),
+      // Pins the article to the top of the Insights page (and its topic page).
+      featured: z.boolean().optional(),
     })
     .superRefine((d, ctx) => {
       if (!d.draft && d.publishDate === null) {

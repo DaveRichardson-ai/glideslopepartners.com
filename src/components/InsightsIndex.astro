@@ -11,7 +11,9 @@ interface Props {
   topic?: string;
 }
 const { insights, topics, topic } = Astro.props;
-const [feature, ...rest] = insights;
+// A pinned article (featured: true) leads; otherwise the newest does.
+const pinned = insights.find((i) => i.data.featured);
+const [feature, ...rest] = pinned ? [pinned, ...insights.filter((i) => i !== pinned)] : insights;
 const label = topic ? topicLabel(topic) : undefined;
 const path = topic ? `/insights/topic/${topic}/` : '/insights/';
 
