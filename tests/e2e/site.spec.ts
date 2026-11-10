@@ -63,7 +63,7 @@ test('security.txt is served', async ({ request }) => {
   expect(exp.getTime()).toBeGreaterThan(Date.now() + 300 * 864e5);
 });
 
-test('Insights lists published articles only; drafts stay hidden', async ({ page, request }) => {
+test('Insights lists published articles; scheduled ones wait for their date', async ({ page, request }) => {
   await page.goto('/');
   await expect(page.locator('header a[href="/insights/"]')).toHaveCount(1);
   await expect(page.locator('footer a[href="/insights/"]')).toHaveCount(1);
@@ -71,10 +71,13 @@ test('Insights lists published articles only; drafts stay hidden', async ({ page
   expect((await request.get('/insights/wealth-re-entry/')).status()).toBe(200);
   expect((await request.get('/rss.xml')).status()).toBe(200);
   expect((await request.get('/insights/tsa-material-arrangement/')).status()).toBe(200);
-  expect((await request.get('/insights/stranded-cost/')).status()).toBe(404);
+  expect((await request.get('/insights/stranded-cost/')).status()).toBe(200);
+  // Scheduled for 12 November 2026: not built before then.
+  if (new Date() < new Date('2026-11-11T13:00:00Z')) {
+    expect((await request.get('/insights/advice-reforms-bank-re-entry/')).status()).toBe(404);
+  }
   const xml = await (await request.get('/sitemap.xml')).text();
   expect(xml).toContain('/insights/wealth-re-entry/');
-  expect(xml).not.toContain('/insights/stranded-cost/');
 });
 
 test('every page has a unique title of 60 characters or fewer and a description of 155 or fewer', async ({ page, request }) => {

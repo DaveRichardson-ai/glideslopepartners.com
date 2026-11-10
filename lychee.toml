@@ -15,5 +15,7 @@ exclude = [
   '/api/contact$',
   # Social images are generated at build time; the absolute URLs only resolve once live.
   '^https://glideslopepartners\.com/og/',
+  # McKinsey drops automated requests without answering; checked by hand.
+  '^https://www\.mckinsey\.com/',
 ]
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36"

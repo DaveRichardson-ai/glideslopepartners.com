@@ -66,7 +66,7 @@ describe('links to articles that are not live yet', () => {
     const live = liveSlugs('src/content/insights', '2026-11-11');
     expect(live.has('wealth-re-entry')).toBe(true);
     expect(live.has('advice-reforms-bank-re-entry')).toBe(false);
-    expect(live.has('stranded-cost')).toBe(false);
+    expect(live.has('stranded-cost')).toBe(true);
     expect(live.has('tsa-material-arrangement')).toBe(true);
     expect(liveSlugs('src/content/insights', '2026-11-12').has('advice-reforms-bank-re-entry')).toBe(true);
   });
