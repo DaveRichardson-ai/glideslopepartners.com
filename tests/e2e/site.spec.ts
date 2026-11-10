@@ -63,14 +63,19 @@ test('security.txt is served', async ({ request }) => {
   expect(exp.getTime()).toBeGreaterThan(Date.now() + 300 * 864e5);
 });
 
-test('drafts only: Insights is hidden everywhere', async ({ page, request }) => {
+test('Insights lists published articles only; drafts stay hidden', async ({ page, request }) => {
   await page.goto('/');
-  await expect(page.locator('header a[href="/insights/"]')).toHaveCount(0);
-  await expect(page.locator('footer a[href="/insights/"]')).toHaveCount(0);
-  await expect(page.locator('#insights')).toHaveCount(0);
-  expect((await request.get('/insights/')).status()).toBe(404);
-  expect((await request.get('/rss.xml')).status()).toBe(404);
-  expect(await (await request.get('/sitemap.xml')).text()).not.toContain('/insights');
+  await expect(page.locator('header a[href="/insights/"]')).toHaveCount(1);
+  await expect(page.locator('footer a[href="/insights/"]')).toHaveCount(1);
+  expect((await request.get('/insights/')).status()).toBe(200);
+  expect((await request.get('/insights/wealth-re-entry/')).status()).toBe(200);
+  expect((await request.get('/rss.xml')).status()).toBe(200);
+  for (const draft of ['/insights/stranded-cost/', '/insights/tsa-material-arrangement/']) {
+    expect((await request.get(draft)).status()).toBe(404);
+  }
+  const xml = await (await request.get('/sitemap.xml')).text();
+  expect(xml).toContain('/insights/wealth-re-entry/');
+  expect(xml).not.toContain('/insights/stranded-cost/');
 });
 
 test('every page has a unique title of 60 characters or fewer and a description of 155 or fewer', async ({ page, request }) => {
