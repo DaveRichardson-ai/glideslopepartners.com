@@ -72,11 +72,12 @@ jobs:
       - name: Email links (address and MX record)
         run: node scripts/check-mailto.mjs dist
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium firefox webkit
-
+      # Browsers run in Microsoft's Playwright image (browsers and system
+      # libraries preinstalled), so tests do not depend on the runner's apt
+      # mirror. Keep the tag in step with @playwright/test in package.json.
       - name: Playwright (console errors, axe, layout, forms, cross-browser and devices)
-        run: npx playwright test
+        run: |
+          docker run --rm --ipc=host --network host --user "$(id -u):$(id -g)" -e HOME=/tmp -e CI -v "$PWD:/work" -w /work "mcr.microsoft.com/playwright:v$(node -p "require('@playwright/test/package.json').version")-noble" npx playwright test
 
       # Own ports (not Playwright's 8788/8789, which may still be closing).
       - name: Start local Pages servers for pa11y and Lighthouse
@@ -168,8 +169,7 @@ jobs:
         env:
           BASE_URL: ${{ steps.deploy.outputs.deployment-url }}
         run: |
-          npx playwright install --with-deps chromium webkit
-          npx playwright test compat site --project=default --project=iphone-15 --grep-invert "contact form submits|drafts only"
+          docker run --rm --ipc=host --network host --user "$(id -u):$(id -g)" -e HOME=/tmp -e CI -e BASE_URL -v "$PWD:/work" -w /work "mcr.microsoft.com/playwright:v$(node -p "require('@playwright/test/package.json').version")-noble"             npx playwright test compat site --project=default --project=iphone-15 --grep-invert "contact form submits|drafts only"
 
   production:
     name: Deploy to production
