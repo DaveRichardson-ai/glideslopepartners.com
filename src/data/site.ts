@@ -17,6 +17,7 @@ export const topicLabels: Record<string, string> = {
   wealth: 'Wealth',
   regulation: 'Regulation',
   diligence: 'Diligence',
+  'ai-governance': 'AI governance',
 };
 
 export const topicLabel = (t: string) =>
