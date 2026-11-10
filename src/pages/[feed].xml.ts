@@ -14,7 +14,7 @@ export async function GET(context: APIContext) {
   const insights = await getPublishedInsights();
   return rss({
     title: 'Glideslope Partners insights',
-    description: 'Practical notes on separations, integrations, TSAs and transformation in Australian financial services.',
+    description: 'Practical insights on separations, integrations, TSAs and broader transformation in Australian financial services.',
     site: context.site ?? site.url,
     customData: '<language>en-au</language>',
     items: insights.map((i) => ({

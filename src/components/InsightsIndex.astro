@@ -18,7 +18,7 @@ const path = topic ? `/insights/topic/${topic}/` : '/insights/';
 const title = label ? `${label} insights — Glideslope Partners` : 'Insights — Glideslope Partners';
 const description = label
   ? `Partner-written notes on ${label.toLowerCase()} in Australian financial services M&A: separations, integrations, TSAs and transformation.`
-  : 'Practical notes on separations, integrations, TSAs and transformation in Australian financial services, written by a Glideslope partner.';
+  : 'Practical insights on separations, integrations, TSAs and broader transformation in Australian financial services.';
 
 const crumbs = [
   { name: 'Home', item: `${site.url}/` },
@@ -40,8 +40,7 @@ const fa = feature ? authors[feature.data.author] : undefined;
     <p class="eyebrow">Insights</p>
     <h1 class="title">{label ? `What we are seeing on deals: ${label.toLowerCase()}.` : 'What we are seeing on deals.'}</h1>
     <p class="lead">
-      Practical notes on separations, integrations, TSAs and transformation in Australian financial services. One new piece
-      a month, written by a partner.
+      Practical insights on separations, integrations, TSAs and broader transformation in Australian financial services.
     </p>
     <nav class="chips" aria-label="Topics">
       <a class="chip" href="/insights/" aria-current={!topic ? 'page' : undefined}>All</a>
