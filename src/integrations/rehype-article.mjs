@@ -1,7 +1,10 @@
 // Rehype plugin for insight articles:
 // - wraps tables in a keyboard-focusable, horizontally scrollable region
 // - marks external links for click tracking and adds rel="noopener"
-
+// - turns links to articles that are not live yet (draft or scheduled) into
+//   plain text, so one article can name another before it publishes; the
+//   link appears on the first build after the other article goes live
+import { liveSlugs } from '../lib/schedule.mjs';
 
 function walk(node, fn, parent = null, index = 0) {
   fn(node, parent, index);
@@ -12,7 +15,9 @@ function walk(node, fn, parent = null, index = 0) {
 }
 
 export function rehypeArticle() {
+  const dir = process.env.INSIGHTS_DIR || './src/content/insights';
   return (tree) => {
+    const live = liveSlugs(dir);
     let tableCount = 0;
     walk(tree, (node, parent, index) => {
       if (node.type !== 'element') return;
@@ -33,6 +38,11 @@ export function rehypeArticle() {
       // screen-reader label so every column header has a name.
       if (node.tagName === 'th' && !(node.children ?? []).some((c) => c.type === 'element' || (c.value ?? '').trim())) {
         node.children = [{ type: 'element', tagName: 'span', properties: { className: ['visually-hidden'] }, children: [{ type: 'text', value: 'Aspect' }] }];
+      }
+      const article = node.tagName === 'a' && String(node.properties?.href ?? '').match(/^\/insights\/([a-z0-9-]+)\/(#.*)?$/);
+      if (article && article[1] !== 'topic' && !live.has(article[1]) && parent) {
+        parent.children[index] = { type: 'element', tagName: 'span', properties: {}, children: node.children };
+        return;
       }
       if (node.tagName === 'a' && typeof node.properties?.href === 'string' && /^https?:\/\//.test(node.properties.href)) {
         node.properties.rel = ['noopener'];

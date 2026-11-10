@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { findPlaceholders } from '../../src/integrations/guards.mjs';
 import { loadTokensCss, tokensToCss } from '../../src/integrations/tokens.mjs';
 import { readingTime } from '../../src/lib/reading-time';
-import { isDue, sydneyToday } from '../../src/lib/schedule';
+import { isDue, sydneyToday } from '../../src/lib/schedule.mjs';
 
 describe('placeholder guard', () => {
   it('finds design placeholders in visible text', () => {
@@ -57,5 +57,17 @@ describe('scheduled publishing', () => {
     expect(isDue(d, '2026-11-11')).toBe(false);
     expect(isDue(d, '2026-11-12')).toBe(true);
     expect(isDue(d, '2026-11-20')).toBe(true);
+  });
+});
+
+describe('links to articles that are not live yet', () => {
+  it('lists only non-draft articles whose date has arrived', async () => {
+    const { liveSlugs } = await import('../../src/lib/schedule.mjs');
+    const live = liveSlugs('src/content/insights', '2026-11-11');
+    expect(live.has('wealth-re-entry')).toBe(true);
+    expect(live.has('advice-reforms-bank-re-entry')).toBe(false);
+    expect(live.has('stranded-cost')).toBe(false);
+    expect(live.has('tsa-material-arrangement')).toBe(true);
+    expect(liveSlugs('src/content/insights', '2026-11-12').has('advice-reforms-bank-re-entry')).toBe(true);
   });
 });

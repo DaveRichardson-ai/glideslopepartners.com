@@ -62,7 +62,7 @@ The partner route gets less attention than it warrants. It gives a bank distribu
 
 On the buy route, few wealth businesses come to market as a clean unit. Most are still tied to a former parent or to sister businesses through shared platforms, trustees and service agreements. Separation work comes first and integration second.
 
-Regulation bears on all three routes. The advice reforms announced in August 2026 leave banks outside the new adviser class and would put a compensation obligation behind platform trustees. We cover that in a companion article, "The advice reforms leave banks out: what that means for re-entry into wealth".
+Regulation bears on all three routes. The advice reforms announced in August 2026 leave banks outside the new adviser class and would put a compensation obligation behind platform trustees. We cover that in a companion article, [The advice reforms leave banks out: what that means for re-entry into wealth](/insights/advice-reforms-bank-re-entry/).
 
 ## Questions for the board
 

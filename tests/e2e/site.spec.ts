@@ -70,9 +70,8 @@ test('Insights lists published articles only; drafts stay hidden', async ({ page
   expect((await request.get('/insights/')).status()).toBe(200);
   expect((await request.get('/insights/wealth-re-entry/')).status()).toBe(200);
   expect((await request.get('/rss.xml')).status()).toBe(200);
-  for (const draft of ['/insights/stranded-cost/', '/insights/tsa-material-arrangement/']) {
-    expect((await request.get(draft)).status()).toBe(404);
-  }
+  expect((await request.get('/insights/tsa-material-arrangement/')).status()).toBe(200);
+  expect((await request.get('/insights/stranded-cost/')).status()).toBe(404);
   const xml = await (await request.get('/sitemap.xml')).text();
   expect(xml).toContain('/insights/wealth-re-entry/');
   expect(xml).not.toContain('/insights/stranded-cost/');

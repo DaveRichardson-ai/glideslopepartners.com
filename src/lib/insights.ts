@@ -1,6 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 export { readingTime } from './reading-time';
-import { isDue } from './schedule';
+import { isDue } from './schedule.mjs';
 
 export type Insight = CollectionEntry<'insights'> & { data: { publishDate: Date } };
 
