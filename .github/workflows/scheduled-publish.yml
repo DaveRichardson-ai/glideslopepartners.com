@@ -1,0 +1,35 @@
+name: Scheduled publish
+
+# An article with draft: false and a future publishDate is scheduled: builds
+# leave it out until that date (Sydney time). Each morning this checks whether
+# any article is due today and, if so, runs the normal CI and deploy on main.
+# 20:05 UTC is 07:05 Sydney in daylight saving time (06:05 otherwise).
+on:
+  schedule:
+    - cron: '5 20 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: src/content/insights
+      - name: Find articles due today
+        id: due
+        run: |
+          today=$(TZ=Australia/Sydney date +%F)
+          due=$(grep -lE "^publishDate: *${today}\b" src/content/insights/*.md | xargs -r grep -lE '^draft: *false\b' || true)
+          echo "Sydney date: $today"
+          if [ -n "$due" ]; then echo "Due today:"; echo "$due"; echo "go=true" >> "$GITHUB_OUTPUT"; else echo "Nothing due today."; fi
+      - name: Deploy
+        if: steps.due.outputs.go == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --ref main

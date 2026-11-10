@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 export { readingTime } from './reading-time';
+import { isDue } from './schedule';
 
 export type Insight = CollectionEntry<'insights'> & { data: { publishDate: Date } };
 
@@ -24,13 +25,18 @@ export function assertPublishable(entry: CollectionEntry<'insights'>) {
 
 let cache: Insight[] | undefined;
 
-/** Published insights, newest first. Throws if a published article fails a guard. */
+/**
+ * Published insights, newest first. An article with draft: false and a future
+ * publishDate is scheduled: it is left out until a build on or after that date
+ * (the Scheduled publish workflow redeploys on the morning it is due).
+ * Throws if a published or scheduled article fails a guard.
+ */
 export async function getPublishedInsights(): Promise<Insight[]> {
   if (cache) return cache;
   const all = await getCollection('insights');
   all.forEach(assertPublishable);
   cache = all
-    .filter((e): e is Insight => !e.data.draft && e.data.publishDate !== null)
+    .filter((e): e is Insight => !e.data.draft && e.data.publishDate !== null && isDue(e.data.publishDate))
     .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
   return cache;
 }

@@ -27,7 +27,7 @@ test('published: index features the newest article; topic chips are real links',
 test('published: article has byline, reading time, scrollable tables, author box, related and JSON-LD', async ({ page }) => {
   await page.goto('/insights/wealth-re-entry/');
   await expect(page.locator('.byline')).toContainText('David Richardson');
-  await expect(page.locator('.byline')).toContainText('17 November 2026');
+  await expect(page.locator('.byline')).toContainText('3 November 2026');
   await expect(page.locator('.byline')).toContainText(/\d+ min read/);
   await expect(page.locator('figure.table-scroll')).toHaveCount(2);
   await expect(page.locator('.author-box')).toContainText('Led the AMP Advice separation');

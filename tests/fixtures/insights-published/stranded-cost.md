@@ -4,7 +4,7 @@ description: "Why the seller's residual cost base belongs in price and deal term
 slug: stranded-cost
 topic: diligence
 author: david-richardson
-publishDate: 2026-11-03
+publishDate: 2026-10-20
 draft: false
 ---
 

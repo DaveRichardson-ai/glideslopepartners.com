@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { findPlaceholders } from '../../src/integrations/guards.mjs';
 import { loadTokensCss, tokensToCss } from '../../src/integrations/tokens.mjs';
 import { readingTime } from '../../src/lib/reading-time';
+import { isDue, sydneyToday } from '../../src/lib/schedule';
 
 describe('placeholder guard', () => {
   it('finds design placeholders in visible text', () => {
@@ -42,5 +43,19 @@ describe('reading time', () => {
     expect(readingTime('word '.repeat(230))).toBe(1);
     expect(readingTime('word '.repeat(231))).toBe(2);
     expect(readingTime('')).toBe(1);
+  });
+});
+
+describe('scheduled publishing', () => {
+  it('uses the Sydney calendar date', () => {
+    // 13:30 UTC on 11 November is 00:30 on 12 November in Sydney (AEDT).
+    expect(sydneyToday(new Date('2026-11-11T13:30:00Z'))).toBe('2026-11-12');
+    expect(sydneyToday(new Date('2026-11-11T12:30:00Z'))).toBe('2026-11-11');
+  });
+  it('publishes on or after the publish date only', () => {
+    const d = new Date('2026-11-12'); // front matter dates parse as UTC midnight
+    expect(isDue(d, '2026-11-11')).toBe(false);
+    expect(isDue(d, '2026-11-12')).toBe(true);
+    expect(isDue(d, '2026-11-20')).toBe(true);
   });
 });

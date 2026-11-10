@@ -4,7 +4,7 @@ description: "CPS 230's grace period for existing contracts ended on 1 July 2026
 slug: tsa-material-arrangement
 topic: regulation
 author: philip-hyde
-publishDate: 2026-11-10
+publishDate: 2026-10-27
 draft: false
 ---
 

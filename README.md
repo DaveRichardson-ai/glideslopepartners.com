@@ -85,7 +85,9 @@ PW_REMOTE=ws://127.0.0.1:3000/ npx playwright test
 3. Open a pull request. CI checks the article and every page. A partner reviews the preview link that CI posts.
 4. Merge. The site deploys and the sitemap is resubmitted to Google.
 
-The build stops with a clear message if a published article (`draft: false`) has no `publishDate`, or still contains `[verify`, `[check`, `[Date]`, `[Name]` or `TODO`. Keep `draft: true` until both partners have reviewed it.
+**To schedule an article,** set `draft: false` and a future `publishDate`, then merge as usual. The build leaves the article out until that date (Sydney time). The Scheduled publish workflow runs at about 7 am each morning and redeploys the site when an article is due. Because a scheduled article is checked when it is merged, it must be finished by then.
+
+The build stops with a clear message if a published or scheduled article (`draft: false`) has no `publishDate`, or still contains `[verify`, `[check`, `[Date]`, `[Name]` or `TODO`. Keep `draft: true` until both partners have reviewed it.
 
 While every article is a draft, the site hides Insights everywhere: navigation, footer, home page, sitemap and RSS. The first published article brings all of it back on the next build. A new topic gets its own page at `/insights/topic/<topic>/` automatically.
 

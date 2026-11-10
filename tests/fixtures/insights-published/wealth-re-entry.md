@@ -4,7 +4,7 @@ description: "The bank exits of 2018–2023 cut eight kinds of connection. Any r
 slug: wealth-re-entry
 topic: wealth
 author: david-richardson
-publishDate: 2026-11-17
+publishDate: 2026-11-03
 draft: false
 ---
 
