@@ -33,4 +33,4 @@ When we describe past transactions, we say what our partners did in prior roles,
 | --- | --- |
 | We deliver seamless, end-to-end transition excellence. | We plan and run separations and integrations, from diligence to TSA exit. |
 | Our deep expertise helps clients navigate complex regulatory landscapes. | We design CPS 230, CPS 234 and SPS 515 obligations into the transition plan from the start. |
-| 30–50% cheaper than the Big 4. | No leverage pyramid. You pay for the people doing the work. |
+| 30–50% cheaper than the Big 4. | The partners you meet do the work. No junior layers billed to your deal. |
