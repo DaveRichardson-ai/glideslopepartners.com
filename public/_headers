@@ -13,6 +13,10 @@
 /brand/*
   Cache-Control: public, max-age=604800
 
+# Logo used in email signatures: keep the URL stable; it lives in sent mail.
+/email/*
+  Cache-Control: public, max-age=604800
+
 /og/*
   Cache-Control: public, max-age=86400
 
