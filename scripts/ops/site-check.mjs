@@ -11,10 +11,15 @@ const withTls = process.argv.includes('--tls');
 const problems = [];
 const seen = new Map();
 
-async function get(url, opts = {}) {
-  const t0 = Date.now();
-  const res = await fetch(url, { redirect: 'manual', headers: { 'User-Agent': 'GlideslopeSiteCheck/1.0' }, ...opts });
-  return { res, ms: Date.now() - t0 };
+// A fresh Pages deployment can answer 404 from a Function route (/contact/)
+// for a few seconds while it warms up, so an error is retried before it counts.
+async function get(url, { retries = 3, ...opts } = {}) {
+  for (let attempt = 0; ; attempt++) {
+    const t0 = Date.now();
+    const res = await fetch(url, { redirect: 'manual', headers: { 'User-Agent': 'GlideslopeSiteCheck/1.0' }, ...opts });
+    if (res.status < 400 || attempt >= retries) return { res, ms: Date.now() - t0 };
+    await new Promise((r) => setTimeout(r, 5000));
+  }
 }
 
 // robots and sitemap
@@ -59,7 +64,7 @@ for (const [from, to] of Object.entries(REDIRECTS)) {
 }
 
 // unknown paths are a real 404
-const { res: missing } = await get(base + '/this-page-should-not-exist-' + Date.now() + '/');
+const { res: missing } = await get(base + '/this-page-should-not-exist-' + Date.now() + '/', { retries: 0 });
 if (missing.status !== 404) problems.push(`unknown path returned ${missing.status}, not 404`);
 
 // TLS certificate
