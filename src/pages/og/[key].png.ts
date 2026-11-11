@@ -13,7 +13,7 @@ type OgProps = {
 
 export const getStaticPaths = (async () => {
   const pages: { key: string; props: OgProps }[] = [
-    { key: 'home', props: { eyebrow: 'M&A transition · Transformation · Sydney · Melbourne · Brisbane', title: 'We plan and run separations, integrations and the transformation that follows.' } },
+    { key: 'home', props: { eyebrow: 'M&A transition · Transformation · Cost reduction · Sydney · Melbourne · Brisbane', title: 'We plan and run separations, integrations and the transformation that follows.' } },
     { key: 'services', props: { eyebrow: 'Services', title: 'Two practices, one team. Deal-driven or standalone.' } },
     { key: 'about', props: { eyebrow: 'About', title: 'Built by practitioners. Delivered by partners.' } },
     { key: 'contact', props: { eyebrow: 'Contact', title: 'Talk to a partner.' } },

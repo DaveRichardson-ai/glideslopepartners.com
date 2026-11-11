@@ -1513,3 +1513,19 @@ button {
 .sting-video figcaption {
   margin-top: 12px;
 }
+
+/* Hero eyebrow: services and cities wrap as two groups, never mid-group on
+   wider screens; on small screens each group takes its own line. */
+@media (min-width: 641px) {
+  .eyebrow--groups > span {
+    white-space: nowrap;
+  }
+}
+@media (max-width: 640px) {
+  .eyebrow--groups > span {
+    display: block;
+  }
+  .eyebrow--groups .eyebrow-sep {
+    display: none;
+  }
+}
