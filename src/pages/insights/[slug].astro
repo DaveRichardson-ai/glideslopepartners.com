@@ -61,7 +61,7 @@ const jsonLd = [
 const shortTitle = d.title.length > 38 ? `${d.title.slice(0, 36).replace(/\s+\S*$/, '')}…` : d.title;
 ---
 
-<Base title={`${shortTitle} — Glideslope Partners`} description={d.description} ogType="article" jsonLd={jsonLd} current="/insights/">
+<Base title={`${shortTitle} — Glideslope Partners`} shareTitle={d.title} description={d.description} ogType="article" jsonLd={jsonLd} current="/insights/">
   <Fragment slot="head">
     <meta property="article:published_time" content={d.publishDate.toISOString()} />
     {d.updatedDate && <meta property="article:modified_time" content={d.updatedDate.toISOString()} />}

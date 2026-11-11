@@ -10,6 +10,8 @@ import { hasInsights } from '../lib/insights';
 
 interface Props {
   title: string;
+  /** Title for link previews (LinkedIn, social, chat apps); defaults to title. */
+  shareTitle?: string;
   description: string;
   noindex?: boolean;
   ogImage?: string;
@@ -19,7 +21,7 @@ interface Props {
   current?: string | undefined;
 }
 
-const { title, description, noindex = false, ogType = 'website', jsonLd = [], turnstile, current } = Astro.props;
+const { title, shareTitle = title, description, noindex = false, ogType = 'website', jsonLd = [], turnstile, current } = Astro.props;
 const pathname = Astro.url.pathname;
 const canonical = new URL(pathname, site.url).href;
 const ogKey = pathname === '/' ? 'home' : pathname.replace(/^\/|\/$/g, '').replace(/\//g, '-');
@@ -47,15 +49,15 @@ const beaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN?.match(/[0-9a-f]{32}/
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content="en_AU" />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={shareTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={title} />
+    <meta property="og:image:alt" content={shareTitle} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={shareTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <slot name="head" />
