@@ -113,6 +113,8 @@ jobs:
 
       - name: Keep reports
         if: always()
+        # A GitHub storage outage must not block a deploy whose checks passed.
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: reports-${{ github.run_id }}
