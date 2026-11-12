@@ -84,7 +84,7 @@ PW_REMOTE=ws://127.0.0.1:3000/ npx playwright test
 
 2. Write the article in markdown below the front matter. Use `##` headings, normal markdown tables (they scroll sideways on phones), and a `## Sources` section with links.
 3. Open a pull request. CI checks the article and every page. A partner reviews the preview link that CI posts.
-4. Merge. The site deploys and the sitemap is resubmitted to Google.
+4. Merge. The site deploys, the sitemap is resubmitted to Google, and the new or changed pages are sent to Bing through IndexNow (`scripts/ops/indexnow.mjs`; the key file `public/d5768351a0ab8b16050a54556b60b791.txt` must stay in place).
 
 **To schedule an article,** set `draft: false` and a future `publishDate`, then merge as usual. The build leaves the article out until that date (Sydney time). The Scheduled publish workflow runs at about 7 am each morning and redeploys the site when an article is due. Because a scheduled article is checked when it is merged, it must be finished by then.
 

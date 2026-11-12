@@ -211,6 +211,10 @@ jobs:
       - name: Save the current live sitemap
         if: steps.secrets.outputs.ready == 'true'
         run: curl -fsS "$SITE_URL/sitemap.xml" -o previous-sitemap.xml || true
+      - name: List pages that differ from the live site (for IndexNow)
+        if: steps.secrets.outputs.ready == 'true'
+        continue-on-error: true
+        run: node scripts/ops/indexnow.mjs changed dist indexnow-urls.txt
       - name: Deploy the enquiry mailer Worker
         if: steps.secrets.outputs.ready == 'true'
         uses: cloudflare/wrangler-action@v4
@@ -238,3 +242,8 @@ jobs:
       - name: Resubmit the sitemap to Search Console if it changed
         if: steps.live.outcome == 'success'
         run: node scripts/ops/gsc-submit.mjs previous-sitemap.xml dist/sitemap.xml
+      # Bing and the other IndexNow engines recrawl the changed pages quickly.
+      - name: Send changed pages to IndexNow
+        if: steps.live.outcome == 'success'
+        continue-on-error: true
+        run: node scripts/ops/indexnow.mjs submit indexnow-urls.txt
