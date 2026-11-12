@@ -542,11 +542,11 @@ button {
   margin-top: 64px;
 }
 .practice-head {
+  /* Heading with its note underneath, the same in both columns, so the
+     headings and rules line up however long either note is. */
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px var(--space-4);
+  flex-direction: column;
+  gap: 6px;
   padding-bottom: var(--space-4);
   border-bottom: 2px solid var(--text);
 }
