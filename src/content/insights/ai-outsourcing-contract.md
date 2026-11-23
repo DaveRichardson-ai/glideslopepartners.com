@@ -74,7 +74,7 @@ The OAIC’s guidance is not binding, and its reach into outsourced processes wi
 
 - [OAIC, New resources on transparency for use of AI and automated decision-making, 30 September 2026](https://www.oaic.gov.au/news/media-centre/new-resources-on-transparency-for-use-of-ai-and-automated-decision-making)
 - [Gilbert + Tobin, Automated decision-making transparency under the Privacy Act](https://www.gtlaw.com.au/insights/automated-decision-making-transparency-under-the-privacy-act)
-- [LK Law, AI and automated decision-making: new guidance on the transparency obligation, 6 October 2026](https://www.lk.law/2026/10/ai-automated-decision-making-new-guidance-on-the-transparency-obligation-for-privacy-policies/)
+- [LK Law, AI and automated decision-making: new guidance on the transparency obligation, 6 October 2026](https://web.archive.org/web/20261008113839/https://www.lk.law/2026/10/ai-automated-decision-making-new-guidance-on-the-transparency-obligation-for-privacy-policies/)
 - [Johnson Winter Slattery, ADM disclosure obligations: key takeaways from the OAIC’s guidance material](https://jws.com.au/what-we-think/adm-disclosure-obligations-key-takeaways-from-the-oaics-guidance-material/)
 - [ASIC, REP 798 Beware the gap: governance arrangements in the face of AI innovation, October 2024](https://download.asic.gov.au/media/mtllqjo0/rep-798-published-29-october-2024.pdf)
 - [APRA, Letter to industry on artificial intelligence, 30 April 2026](https://www.apra.gov.au/news-and-publications/apra-letter-industry-artificial-intelligence-ai)
